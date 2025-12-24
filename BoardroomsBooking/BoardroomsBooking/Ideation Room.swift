@@ -18,46 +18,99 @@ struct RoomDetailsView: View {
 
                 // MARK: Header Image
                 ZStack(alignment: .top) {
-                    Image("room_image") // replace with your asset
+                    HStack {
+                        Button(action: {}) {
+                            Image(systemName: "chevron.left")
+                                .foregroundColor(.white)
+                                .offset(y: 20)
+
+                        }
+
+                        Spacer()
+
+                        Text("Ideation Room")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .offset(y: 20)
+
+                        Spacer()
+
+                        // Spacer وهمي لمعادلة زر الرجوع
+                        Spacer()
+                            .frame(width: 24 ,height: 74)
+                    }
+                    .padding(.horizontal)
+                    .padding(.top, 20)      // 👈 نزول السهم والكلمة
+                    .padding(.bottom, 12)
+                    .background(Color(hex: "232455"))
+
+                }
+//                .offset(y: 20)
+
+                // MARK: Floor & Capacity
+                ZStack(alignment: .bottom) {
+
+                    // الصورة
+                    Image("IdeationRoom")
                         .resizable()
                         .scaledToFill()
                         .frame(height: 260)
                         .clipped()
 
-                    // Navigation Bar
-                    HStack {
-                        Button(action: {}) {
-                            Image(systemName: "chevron.left")
-                                .foregroundColor(.white)
-                                .padding()
+                    // التدرج الأبيض
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            Color.white.opacity(0.95),
+                            Color.white.opacity(0.7),
+                            Color.white.opacity(0.4),
+                            Color.clear
+                        ]),
+                        startPoint: .bottom,
+                        endPoint: .top
+                    )
+                    .frame(height: 140)
+
+                    // المحتوى
+                    VStack(spacing: 16) {
+
+                        // العنوان
+                        HStack {
+                           
+                          
+
+                            Spacer()
+
+//                            Text("Ideation Room")
+//                                .font(.headline)
+//                                .foregroundColor(.white)
+
+                            Spacer()
+                            Spacer().frame(width: 24)
                         }
-                        Spacer()
-                        Text("Ideation Room")
-                            .font(.headline)
-                            .foregroundColor(.white)
-                        Spacer()
-                        Spacer().frame(width: 44)
+                        .padding(.top, 50)
+                        .padding(.horizontal)
+
+                        // Floor & Capacity
+                        HStack {
+                            Label("Floor 3", systemImage: "paperplane")
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+
+                            Spacer()
+
+                            Label("16", systemImage: "person.2")
+                                .font(.subheadline)
+                                .foregroundColor(Color(hex: "#D45E39"))
+                                .padding(8)
+                                .background(Color(hex: "#ffffff")/*.opacity(0.15)*/)
+                                .cornerRadius(10)
+                        }//#D45E39
+                        .padding(.horizontal)
                     }
-                    .padding(.top, 50)
-                    .background(Color(hex: "232455"))
+                    .padding(.bottom, 12)
                 }
+                .offset(y: -30)
 
-                // MARK: Floor & Capacity
-                HStack {
-                    Label("Floor 3", systemImage: "paperplane")
-                        .font(.subheadline)
-                        .foregroundColor(.gray)
-
-                    Spacer()
-
-                    Label("16", systemImage: "person.2")
-                        .font(.subheadline)
-                        .foregroundColor(.orange)
-                        .padding(8)
-                        .background(Color.orange.opacity(0.15))
-                        .cornerRadius(10)
-                }
-                .padding(.horizontal)
 
                 // MARK: Description
                 VStack(alignment: .leading, spacing: 8) {
@@ -74,6 +127,7 @@ Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem
                         .cornerRadius(12)
                 }
                 .padding(.horizontal)
+                .offset(y: -30)
 
                 // MARK: Facilities
                 VStack(alignment: .leading, spacing: 10) {
@@ -86,6 +140,7 @@ Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem
                     }
                 }
                 .padding(.horizontal)
+                .offset(y: -30)
 
                 // MARK: Calendar
                 VStack(alignment: .leading, spacing: 12) {
@@ -105,7 +160,7 @@ Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem
                     }
                 }
                 .padding(.horizontal)
-
+                .offset(y: -30)
                 // MARK: Booking Button
                 Button(action: {}) {
                     Text("Booking")
@@ -118,6 +173,7 @@ Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem
                 }
                 .padding(.horizontal)
                 .padding(.bottom, 30)
+                .offset(y: -30)
             }
         }
         .ignoresSafeArea(edges: .top)
@@ -158,7 +214,7 @@ struct DateItemView: View {
                 .font(.headline)
                 .foregroundColor(isSelected ? .white : .primary)
                 .frame(width: 44, height: 44)
-                .background(isSelected ? Color.orange : Color(.systemGray6))
+                .background(isSelected ? Color(hex: "D45E39"): Color(.systemGray6))
                 .cornerRadius(22)
         }
     }
