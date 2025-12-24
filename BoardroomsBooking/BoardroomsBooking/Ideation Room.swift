@@ -40,7 +40,7 @@ struct RoomDetailsView: View {
                             .frame(width: 24 ,height: 74)
                     }
                     .padding(.horizontal)
-                    .padding(.top, 20)      // 👈 نزول السهم والكلمة
+                    .padding(.top, 20)      //👈   والكلمة
                     .padding(.bottom, 12)
                     .background(Color(hex: "232455"))
 
