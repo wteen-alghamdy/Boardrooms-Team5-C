@@ -1,133 +1,250 @@
 import SwiftUI
 
-struct BookingCard: View {
-    var body: some View {
-        
-        
-        ZStack {
-            Color(hex:  "232455")
-                .ignoresSafeArea(edges: .top)
-            
-            HStack {
-                Button(action: {}) {
-                    Image(systemName: "chevron.left")
-                        .foregroundColor(.white)
-                        .offset(y: 30)
-
-                }
-                
-                Spacer()
-                
-                Text("My Booking ")
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .offset(y: 40)
-
-                Spacer()
-                
-                // Spacer وهمي لمعادلة زر الرجوع
-                Spacer()
-                    .frame(width: 24)
-            }
-            .padding(.horizontal)
-            .padding(.top, 40) // مساحة الـ notch أو status bar
-            .padding(.bottom, 12)
-        }
-        .frame(height: 160) // ارتفاع الهيدر
-        
-        ZStack{
-            Image("bg_topo_pattern") // Ensure this name matches your Assets.xcassets
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-//                .ignoresSafeArea()
-                .ignoresSafeArea(edges: .bottom)
-                .offset(y: -9)
-
-            
-            
-            
-            HStack(alignment: .top, spacing: 12) {
-                
-                
-                
-                // Placeholder for the workspace image
-                Image("CreativeSpace") // Ensure you add an image to Assets
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: 100, height: 100)
-                    .cornerRadius(12)
-                
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack {
-                        Text("Creative Space")
-                            .font(.headline)
-                            .foregroundColor(Color(red: 0.1, green: 0.1, blue: 0.3))
-                        Spacer()
-                        Text("28 March")
-                            .font(.caption2)
-                            .fontWeight(.medium)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
-                            .background(Color(red: 0.15, green: 0.15, blue: 0.35))
-                            .foregroundColor(.white)
-                            .cornerRadius(6)
-                    }
-                    
-                    Text("Floor 5")
-                        .font(.subheadline)
-                        .foregroundColor(.gray)
-                    
-                    HStack(spacing: 12) {
-                        // Capacity Icon/Text
-                        HStack(spacing: 4) {
-                            Image(systemName: "person.2")
-                                .font(.system(size: 12))
-                            Text("1")
-                                .font(.caption)
-                        }
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(Color.orange.opacity(0.1))
-                        .foregroundColor(.orange)
-                        .cornerRadius(6)
-                    }
-                    
-                    // Wifi Icon
-                    Image(systemName: "wifi")
-                        .font(.system(size: 12))
-                        .foregroundColor(Color(red: 0.1, green: 0.1, blue: 0.3))
-                        .padding(6)
-                        .background(Color.blue.opacity(0.05))
-                        .clipShape(Circle())
-                }
-            }
-            .padding()
-            .frame(width: 385, height: 140)
-            .background(Color.white)
-            .cornerRadius(16)
-            .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
-        }
-    }
-    
-}
+//struct BookingCard: View {
+//    var body: some View {
+//        
+//        
+//        ZStack {
+//            Color(hex:  "232455")
+//                .ignoresSafeArea(edges: .top)
+//            
+//            HStack {
+//                Button(action: {}) {
+//                    Image(systemName: "chevron.left")
+//                        .foregroundColor(.white)
+//                        .offset(y: 30)
+//
+//                }
+//                
+//                Spacer()
+//                
+//                Text("My Booking ")
+//                    .font(.headline)
+//                    .foregroundColor(.white)
+//                    .offset(y: 40)
+//
+//                Spacer()
+//                
+//                // Spacer وهمي لمعادلة زر الرجوع
+//                Spacer()
+//                    .frame(width: 24)
+//            }
+//            .padding(.horizontal)
+//            .padding(.top, 40) // مساحة الـ notch أو status bar
+//            .padding(.bottom, 12)
+//        }
+//        .frame(height: 160) // ارتفاع الهيدر
+//        
+//        
+//        ZStack{
+//            Image("bg_topo_pattern") // Ensure this name matches your Assets.xcassets
+//                .resizable()
+//                .aspectRatio(contentMode: .fill)
+////                .ignoresSafeArea()
+//                .ignoresSafeArea(edges: .bottom)
+//                .offset(y: -9)
+//
+//            
+//            
+//            
+//            HStack(alignment: .top, spacing: 12) {
+//                
+//                
+//                
+//                // Placeholder for the workspace image
+//                Image("CreativeSpace") // Ensure you add an image to Assets
+//                    .resizable()
+//                    .aspectRatio(contentMode: .fill)
+//                    .frame(width: 100, height: 100)
+//                    .cornerRadius(12)
+//                
+//                VStack(alignment: .leading, spacing: 4) {
+//                    HStack {
+//                        Text("Creative Space")
+//                            .font(.headline)
+//                            .foregroundColor(Color(red: 0.1, green: 0.1, blue: 0.3))
+//                        Spacer()
+//                        Text("28 March")
+//                            .font(.caption2)
+//                            .fontWeight(.medium)
+//                            .padding(.horizontal, 8)
+//                            .padding(.vertical, 4)
+//                            .background(Color(red: 0.15, green: 0.15, blue: 0.35))
+//                            .foregroundColor(.white)
+//                            .cornerRadius(6)
+//                    }
+//                    
+//                    Text("Floor 5")
+//                        .font(.subheadline)
+//                        .foregroundColor(.gray)
+//                    
+//                    HStack(spacing: 12) {
+//                        // Capacity Icon/Text
+//                        HStack(spacing: 4) {
+//                            Image(systemName: "person.2")
+//                                .font(.system(size: 12))
+//                            Text("1")
+//                                .font(.caption)
+//                        }
+//                        .padding(.horizontal, 8)
+//                        .padding(.vertical, 4)
+//                        .background(Color.orange.opacity(0.1))
+//                        .foregroundColor(.orange)
+//                        .cornerRadius(6)
+//                    }
+//                    
+//                    // Wifi Icon
+//                    Image(systemName: "wifi")
+//                        .font(.system(size: 12))
+//                        .foregroundColor(Color(red: 0.1, green: 0.1, blue: 0.3))
+//                        .padding(6)
+//                        .background(Color.blue.opacity(0.05))
+//                        .clipShape(Circle())
+//                }
+//            }
+//            .padding()
+//            .frame(width: 385, height: 140)
+//            .background(Color.white)
+//            .cornerRadius(16)
+//            .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+//            
+//            
+//            
+//            
+//            
+//        }
+//    }
+//    
+//}
 struct MyBookingView: View {
     var body: some View {
-        VStack(spacing: 0) {
-                // Content Area
+        ZStack {
+            Image("bg_topo_pattern")
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .ignoresSafeArea()
+
+            VStack(spacing: 0) {
+
+                // HEADER
+                ZStack {
+                    Color(hex: "232455")
+                    HStack {
+                        Button(action: {}) {
+                            Image(systemName: "chevron.left")
+                                .foregroundColor(.white)
+                        }
+
+                        Spacer()
+
+                        Text("My Booking")
+                            .font(.headline)
+                            .foregroundColor(.white)
+
+                        Spacer()
+                        Spacer().frame(width: 24)
+                    }
+                    .padding(.top, 50)
+                    .padding(.horizontal)
+                }
+                .frame(height: 110)
+                .offset(y: -30)
+
+
+                // LIST
                 ScrollView {
-                    VStack(spacing: 16) {
-                        ForEach(0..<4) { _ in
+                    LazyVStack(spacing: 16) {
+                        ForEach(0..<5, id: \.self) { _ in
                             BookingCard()
                         }
                     }
                     .padding()
                 }
-
             }
         }
     }
+}
+
+
+
+//struct MyBookingView: View {
+//    var body: some View {
+//        VStack(spacing: 0) {
+//                // Content Area
+//                ScrollView {
+//                    LazyVStack(spacing: 16) {
+//                        ForEach(0..<10) { _ in
+//                            BookingCard()
+//                            BookingCard()
+//                            BookingCard()
+//                        }
+//                    }
+//                    .padding()
+//                }
+//
+//            }
+//        }
+//    }
+struct BookingCard: View {
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+
+            Image("CreativeSpace")
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(width: 100, height: 100)
+                .cornerRadius(12)
+
+            VStack(alignment: .leading, spacing: 6) {
+                HStack {
+                    Text("Creative Space")
+                        .font(.headline)
+                        .foregroundColor(Color(red: 0.1, green: 0.1, blue: 0.3))
+                    Spacer()
+                    Text("28 March")
+                        .font(.caption2)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(Color(red: 0.15, green: 0.15, blue: 0.35))
+                        .foregroundColor(.white)
+                        .cornerRadius(6)
+                }
+
+                Text("Floor 5")
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
+
+                HStack(spacing: 12) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "person.2")
+                            .font(.system(size: 12))
+                        Text("1")
+                            .font(.caption)
+                    }
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Color.orange.opacity(0.1))
+                    .foregroundColor(.orange)
+                    .cornerRadius(6)
+
+                    Image(systemName: "wifi")
+                        .font(.system(size: 12))
+                        .padding(6)
+                        .background(Color.blue.opacity(0.05))
+                        .clipShape(Circle())
+                }
+            }
+        }
+        .padding()
+        .frame(width: 385, height: 140)
+        .background(Color.white)
+        .cornerRadius(16)
+        .shadow(color: .black.opacity(0.05), radius: 5)
+    }
+}
+
 
 
 #Preview {
-    BookingCard()
+    MyBookingView()
 }
