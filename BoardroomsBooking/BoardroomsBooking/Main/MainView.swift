@@ -4,99 +4,105 @@
 //
 //  Created by Wteen Alghamdy on 05/07/1447 AH.
 //
-import SwiftUI
 
+
+import SwiftUI
 struct MainView: View {
-    // MARK: - Mock Data
-    let dates: [String] = ["16", "19", "20", "21", "22", "23", "26", "27", "28"]
-    let days:  [String] = ["Thu", "Sun", "Mon", "Tue", "Wed", "Thu", "Sun", "Mon", "Tue"]
+    @StateObject private var viewModel = MainViewModel()
+
+    init() {
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = UIColor(named: "navyBlue")
+        appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
+        
+        UINavigationBar.appearance().standardAppearance = appearance
+        UINavigationBar.appearance().scrollEdgeAppearance = appearance
+    }
 
     var body: some View {
         NavigationView {
             ZStack {
-                // MARK: Background Color
                 Color("systemGrayLight")
                     .ignoresSafeArea()
-
                 ScrollView(showsIndicators: false) {
-                    VStack(alignment: .leading, spacing: 24) {
-                        
-                        // MARK: 1. Top Banner
-                        ZStack(alignment: .leading) {
+                    VStack(alignment: .leading, spacing: 25) {
+                       
+                        // MARK: - Banner Section
+                        ZStack(alignment: .bottomTrailing) {
                             Image("bg_banner_available")
                                 .resizable()
                                 .aspectRatio(contentMode: .fill)
-                                .frame(height: 160)
+                                .frame(height: 200)
+                                .frame(maxWidth: .infinity)
                                 .clipped()
-                                .cornerRadius(20)
+                                .cornerRadius(16)
                             
                             VStack(alignment: .leading, spacing: 4) {
                                 Text("All board rooms")
-                                    .font(.caption)
+                                    .font(.system(size: 14))
                                     .foregroundColor(.white.opacity(0.8))
                                 Text("Available today")
-                                    .font(.title2.bold())
+                                    .font(.system(size: 32, weight: .bold))
                                     .foregroundColor(.white)
-                                
                                 Spacer()
-                                
-                                HStack {
-                                    Text("Book now")
-                                        .font(.subheadline.bold())
-                                    Image(systemName: "arrow.right.circle.fill")
-                                }
-                                .foregroundColor(.white)
                             }
+                            .padding(25)
+                            .frame(maxWidth: .infinity, maxHeight: 180, alignment: .topLeading)
+
+                            HStack(spacing: 4) {
+                                Text("Book now")
+                                    .font(.system(size: 12, weight: .semibold))
+                                Image(systemName: "arrow.right.circle.fill")
+                                    .font(.system(size: 24))
+                            }
+                            .foregroundColor(.white)
                             .padding(20)
                         }
-                        
-                        // MARK: 2. My Booking Section
+                        .padding(.horizontal)
+
+                        // MARK: - My Booking Section
                         VStack(alignment: .leading, spacing: 14) {
                             HStack {
                                 Text("My booking")
-                                    .font(.headline)
+                                    .font(.system(size: 18, weight: .bold))
                                     .foregroundColor(Color("navyBlue"))
                                 Spacer()
-                                Button("See All") {}.font(.caption).foregroundColor(Color("brandOrange"))
+                                Button("See All") {}.font(.subheadline).foregroundColor(Color("brandOrange"))
                             }
+                            .padding(.horizontal)
                             
-                            RoomCardView(
-                                imageName: "CreativeSpace",
-                                title: "Creative Space",
-                                floor: "Floor 5",
-                                capacity: "1",
-                                tag: "28 March",
-                                tagColor: Color("navyBlue"),
-                                tagTextColor: .white
-                            )
+                            RoomCardView(imageName: "CreativeSpace", title: "Creative Space", floor: "Floor 5", capacity: "1", tag: "28 March", tagColor: Color("navyBlue"), tagTextColor: .white, facilities: ["wifi"])
+                                .padding(.horizontal)
                         }
-                        
-                        // MARK: 3. Calendar & All Bookings
+
+                        // MARK: - All Bookings Section
                         VStack(alignment: .leading, spacing: 16) {
                             Text("All bookings for March")
-                                .font(.headline)
+                                .font(.system(size: 18, weight: .bold))
                                 .foregroundColor(Color("navyBlue"))
+                                .padding(.horizontal)
                             
-                            // Horizontal Date Picker
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 12) {
-                                    ForEach(0..<dates.count, id: \.self) { index in
-                                        DateItemView(day: days[index], date: dates[index], isSelected: index == 0)
+                                    ForEach(0..<viewModel.dates.count, id: \.self) { index in
+                                        DateItemView(day: viewModel.days[index], date: viewModel.dates[index], isSelected: index == 0)
                                     }
                                 }
+                                .padding(.horizontal)
                             }
                             
-                            // Rooms List
                             VStack(spacing: 16) {
-                                RoomCardView(imageName: "CreativeSpace", title: "Creative Space", floor: "Floor 5", capacity: "1", tag: "Available", tagColor: Color("successGreenLight"), tagTextColor: Color("successGreen"))
+                                RoomCardView(imageName: "CreativeSpace", title: "Creative Space", floor: "Floor 5", capacity: "1", tag: "Available", tagColor: Color("successGreenLight"), tagTextColor: Color("successGreen"), facilities: ["wifi"])
                                 
-                                RoomCardView(imageName: "IdeationRoom", title: "Ideation Room", floor: "Floor 3", capacity: "16", tag: "Unavailable", tagColor: Color("errorRedLight"), tagTextColor: Color("errorRed"))
+                                RoomCardView(imageName: "IdeationRoom", title: "Ideation Room", floor: "Floor 3", capacity: "16", tag: "Unavailable", tagColor: Color("errorRedLight"), tagTextColor: Color("errorRed"), facilities: ["wifi", "desktopcomputer"])
                                 
-                                RoomCardView(imageName: "InspirationRoom", title: "Inspiration Room", floor: "Floor 1", capacity: "18", tag: "Unavailable", tagColor: Color("errorRedLight"), tagTextColor: Color("errorRed"))
+                                RoomCardView(imageName: "InspirationRoom", title: "Inspiration Room", floor: "Floor 1", capacity: "18", tag: "Unavailable", tagColor: Color("errorRedLight"), tagTextColor: Color("errorRed"), facilities: ["wifi", "mic", "video.fill"])
                             }
+                            .padding(.horizontal)
                         }
                     }
-                    .padding()
+                    .padding(.vertical)
                 }
             }
             .navigationTitle("Board Rooms")
@@ -105,8 +111,7 @@ struct MainView: View {
     }
 }
 
-// MARK: - Reusable Components
-
+// MARK: - Components
 struct RoomCardView: View {
     let imageName: String
     let title: String
@@ -115,6 +120,7 @@ struct RoomCardView: View {
     let tag: String
     let tagColor: Color
     let tagTextColor: Color
+    let facilities: [String]
 
     var body: some View {
         HStack(spacing: 15) {
@@ -130,28 +136,26 @@ struct RoomCardView: View {
                     Spacer()
                     Text(tag)
                         .font(.system(size: 10, weight: .bold))
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(tagColor)
-                        .foregroundColor(tagTextColor)
-                        .cornerRadius(6)
+                        .padding(.horizontal, 8).padding(.vertical, 4)
+                        .background(tagColor).foregroundColor(tagTextColor).cornerRadius(6)
                 }
                 
-                Text(floor)
-                    .font(.caption)
-                    .foregroundColor(Color("textSecondary"))
+                Text(floor).font(.caption).foregroundColor(Color("textSecondary"))
                 
-                HStack(spacing: 12) {
-                    Label(capacity, systemImage: "person.2")
-                    Image(systemName: "wifi")
-                    if title.contains("Ideation") { Image(systemName: "desktopcomputer") }
-                    if title.contains("Inspiration") {
-                        Image(systemName: "mic")
-                        Image(systemName: "video")
+                HStack(spacing: 8) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "person.2")
+                        Text(capacity)
+                    }
+                    .font(.system(size: 10, weight: .medium))
+                    .padding(.horizontal, 6).padding(.vertical, 2)
+                    .background(Color.gray.opacity(0.1)).cornerRadius(4)
+                    .foregroundColor(Color("brandOrange"))
+
+                    ForEach(facilities, id: \.self) { icon in
+                        Image(systemName: icon).font(.system(size: 10)).foregroundColor(.gray)
                     }
                 }
-                .font(.caption2)
-                .foregroundColor(Color("textDisabled"))
             }
         }
         .padding(12)
@@ -161,7 +165,6 @@ struct RoomCardView: View {
     }
 }
 
-// MARK: - Preview
 #Preview {
     MainView()
 }
