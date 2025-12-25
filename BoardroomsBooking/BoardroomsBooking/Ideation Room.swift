@@ -11,6 +11,7 @@ struct RoomDetailsView: View {
 
     let dates: [String] = ["16", "19", "20", "21", "22", "23", "26", "27", "28"]
     let days:  [String] = ["Thu", "Sun", "Mon", "Tue", "Wed", "Thu", "Sun", "Mon", "Tue"]
+    @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
         ScrollView {
@@ -19,7 +20,10 @@ struct RoomDetailsView: View {
                 // MARK: Header Image
                 ZStack(alignment: .top) {
                     HStack {
-                        Button(action: {}) {
+                        Button(action: {
+                            presentationMode.wrappedValue.dismiss()
+
+                        }) {
                             Image(systemName: "chevron.left")
                                 .foregroundColor(.white)
                                 .offset(y: 20)
