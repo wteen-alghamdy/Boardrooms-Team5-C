@@ -18,7 +18,7 @@ struct BookingCard: View {
                 
                 Spacer()
                 
-                Text("Ideation Room")
+                Text("My Booking ")
                     .font(.headline)
                     .foregroundColor(.white)
                     .offset(y: 40)
@@ -41,6 +41,7 @@ struct BookingCard: View {
                 .aspectRatio(contentMode: .fill)
 //                .ignoresSafeArea()
                 .ignoresSafeArea(edges: .bottom)
+                .offset(y: -9)
 
             
             
@@ -101,6 +102,7 @@ struct BookingCard: View {
                 }
             }
             .padding()
+            .frame(width: 385, height: 140)
             .background(Color.white)
             .cornerRadius(16)
             .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
@@ -111,37 +113,6 @@ struct BookingCard: View {
 struct MyBookingView: View {
     var body: some View {
         VStack(spacing: 0) {
-            // ✅ الهيدر
-//            ZStack {
-//                Color(.black)
-//                    .ignoresSafeArea(edges: .top)
-//                
-//                HStack {
-//                    Button(action: {}) {
-//                        Image(systemName: "chevron.left")
-//                            .foregroundColor(.white)
-//                    }
-//                    
-//                    Spacer()
-//                    
-//                    Text("Ideation Room")
-//                        .font(.headline)
-//                        .foregroundColor(.black)
-//                    
-//                    Spacer()
-//                    
-//                    // Spacer وهمي لمعادلة زر الرجوع
-//                    Spacer()
-//                        .frame(width: 24)
-//                }
-//                .padding(.horizontal)
-//                .padding(.top, 40) // مساحة الـ notch أو status bar
-//                .padding(.bottom, 12)
-//            }
-//            .frame(height: 90) // ارتفاع الهيدر
-
-                
-                
                 // Content Area
                 ScrollView {
                     VStack(spacing: 16) {
@@ -151,14 +122,7 @@ struct MyBookingView: View {
                     }
                     .padding()
                 }
-//                .background(
-//                    // Replace with your topographic pattern image
-//                    Image("topographic_pattern")
-//                        .resizable()
-//                        .aspectRatio(contentMode: .fill)
-//                        .opacity(0.4) // Adjust to match the subtle lines
-//                        .edgesIgnoringSafeArea(.bottom)
-//                )
+
             }
         }
     }
