@@ -117,7 +117,10 @@ import SwiftUI
 //    
 //}
 struct MyBookingView: View {
+    @Environment(\.presentationMode) var presentationMode
+
     var body: some View {
+
         ZStack {
             Image("bg_topo_pattern")
                 .resizable()
@@ -130,7 +133,10 @@ struct MyBookingView: View {
                 ZStack {
                     Color(hex: "232455")
                     HStack {
-                        Button(action: {}) {
+                        Button(action: {
+                            presentationMode.wrappedValue.dismiss()
+
+                        }) {
                             Image(systemName: "chevron.left")
                                 .foregroundColor(.white)
                         }
@@ -155,7 +161,7 @@ struct MyBookingView: View {
                 ScrollView {
                     LazyVStack(spacing: 16) {
                         ForEach(0..<5, id: \.self) { _ in
-                            BookingCard()
+                            BookingCard(dateText: "28 March")
                         }
                     }
                     .padding()
@@ -186,6 +192,8 @@ struct MyBookingView: View {
 //        }
 //    }
 struct BookingCard: View {
+    let dateText: String
+
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
 
@@ -201,13 +209,21 @@ struct BookingCard: View {
                         .font(.headline)
                         .foregroundColor(Color(red: 0.1, green: 0.1, blue: 0.3))
                     Spacer()
-                    Text("28 March")
-                        .font(.caption2)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(Color(red: 0.15, green: 0.15, blue: 0.35))
-                        .foregroundColor(.white)
-                        .cornerRadius(6)
+                    
+                                    Text(dateText)
+                                        .font(.caption2)
+                                        .padding(.horizontal, 8)
+                                        .padding(.vertical, 4)
+                                        .background(dateText == "Available" ? Color("successGreenLight") : Color("navyBlue"))
+                                        .foregroundColor(dateText == "Available" ? Color("successGreen") : Color("systemGrayLight"))
+                                            .cornerRadius(6)
+                    
+//                        .font(.caption2)
+//                        .padding(.horizontal, 8)
+//                        .padding(.vertical, 4)
+//                        .background(Color(red: 0.15, green: 0.15, blue: 0.35))
+//                        .foregroundColor(.white)
+//                        .cornerRadius(6)
                 }
 
                 Text("Floor 5")
