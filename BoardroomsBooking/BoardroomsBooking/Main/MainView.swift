@@ -7,6 +7,7 @@
 
 
 import SwiftUI
+
 struct MainView: View {
     @StateObject private var viewModel = MainViewModel()
 
@@ -25,11 +26,14 @@ struct MainView: View {
             ZStack {
                 Color("systemGrayLight")
                     .ignoresSafeArea()
+
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 25) {
-                       
-                        // MARK: - Banner Section
-                        ZStack(alignment: .bottomTrailing) {
+                        
+                        
+                        
+                        // MARK: - Banner
+                        ZStack {
                             Image("bg_banner_available")
                                 .resizable()
                                 .aspectRatio(contentMode: .fill)
@@ -38,32 +42,42 @@ struct MainView: View {
                                 .clipped()
                                 .cornerRadius(16)
                             
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("All board rooms")
-                                    .font(.system(size: 14))
-                                    .foregroundColor(.white.opacity(0.8))
-                                Text("Available today")
-                                    .font(.system(size: 32, weight: .bold))
-                                    .foregroundColor(.white)
+                            VStack(alignment: .leading) {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("All board rooms")
+                                        .font(.system(size: 14))
+                                        .foregroundColor(.white.opacity(0.8))
+                                    Text("Available today")
+                                        .font(.system(size: 28, weight: .bold))
+                                        .foregroundColor(.white)
+                                }
+                                
                                 Spacer()
+                                
+                                
+                                HStack {
+                                    Spacer()
+                                    HStack(spacing: 4) {
+                                        Text("Book now")
+                                            .font(.system(size: 12, weight: .semibold))
+                                        Image(systemName: "arrow.right.circle.fill")
+                                            .font(.system(size: 22))
+                                    }
+                                    .foregroundColor(.white)
+                                }
                             }
-                            .padding(25)
-                            .frame(maxWidth: .infinity, maxHeight: 180, alignment: .topLeading)
-
-                            HStack(spacing: 4) {
-                                Text("Book now")
-                                    .font(.system(size: 12, weight: .semibold))
-                                Image(systemName: "arrow.right.circle.fill")
-                                    .font(.system(size: 24))
-                            }
-                            .foregroundColor(.white)
-                            .padding(20)
+                            .padding(40)
+                            .frame(height: 100)
                         }
                         .padding(.horizontal)
 
-                        // MARK: - My Booking Section
-                        VStack(alignment: .leading, spacing: 14) {
-                            HStack {
+                        
+                        
+                        
+                    // MARK: - My Booking
+                    VStack(alignment: .leading, spacing: 15) {
+                          
+                        HStack {
                                 Text("My booking")
                                     .font(.system(size: 18, weight: .bold))
                                     .foregroundColor(Color("navyBlue"))
@@ -76,12 +90,16 @@ struct MainView: View {
                                 .padding(.horizontal)
                         }
 
-                        // MARK: - All Bookings Section
-                        VStack(alignment: .leading, spacing: 16) {
+                        
+                        
+                        
+                        // MARK: - Room List & Calendar
+                        VStack(alignment: .leading, spacing: 15) {
                             Text("All bookings for March")
                                 .font(.system(size: 18, weight: .bold))
                                 .foregroundColor(Color("navyBlue"))
                                 .padding(.horizontal)
+                            
                             
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 12) {
@@ -91,6 +109,7 @@ struct MainView: View {
                                 }
                                 .padding(.horizontal)
                             }
+                            
                             
                             VStack(spacing: 16) {
                                 RoomCardView(imageName: "CreativeSpace", title: "Creative Space", floor: "Floor 5", capacity: "1", tag: "Available", tagColor: Color("successGreenLight"), tagTextColor: Color("successGreen"), facilities: ["wifi"])
@@ -111,7 +130,9 @@ struct MainView: View {
     }
 }
 
-// MARK: - Components
+
+
+// MARK: - Room Card Component
 struct RoomCardView: View {
     let imageName: String
     let title: String
@@ -165,6 +186,8 @@ struct RoomCardView: View {
     }
 }
 
+// MARK: - Preview
 #Preview {
     MainView()
 }
+
