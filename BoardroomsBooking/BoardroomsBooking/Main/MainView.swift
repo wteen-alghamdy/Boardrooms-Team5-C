@@ -47,6 +47,7 @@ struct MainView: View {
                                     .foregroundColor(.white)
                                 Spacer()
                             }
+                            
                             .padding(25)
                             .frame(maxWidth: .infinity, maxHeight: 180, alignment: .topLeading)
 
