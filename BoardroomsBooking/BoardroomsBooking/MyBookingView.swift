@@ -105,7 +105,7 @@ struct MyBookingView: View {
                             .background(dateText == "Available" ? Color("successGreenLight") : Color("navyBlue"))
                             .foregroundColor(dateText == "Available" ? Color("successGreen") : Color("systemGrayLight"))
                             .cornerRadius(6)
-                        //                    
+                        //
                         //                        .font(.caption2)
                         //                        .padding(.horizontal, 8)
                         //                        .padding(.vertical, 4)

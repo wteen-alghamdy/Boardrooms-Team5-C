@@ -24,4 +24,3 @@ struct BookingFields: Decodable {
     let status: String?
 }
  
-

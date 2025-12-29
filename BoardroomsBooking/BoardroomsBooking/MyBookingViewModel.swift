@@ -1,4 +1,4 @@
-//
+
 //  MyBookingViewModel.swift
 //  BoardroomsBooking
 //
@@ -15,7 +15,7 @@ final class MyBookingViewModel: ObservableObject {
     @Published var isLoading = false
 
     private let urlString = "https://api.airtable.com/v0/appElKqRPusTLsnNe/bookings"
-    private let token = "pat7E88yW3dgzlY61.2b7d03863aca9f1262dcb772f7728bd157e695799b43c7392d5faf4f52fcb001"
+    private let token = "Bearer pat7E88yW3dgzlY61.2b7d03863aca9f1262dcb772f7728bd157e695799b43c7392d5faf4f52fcb001"
 
     func fetchBookings() async {
         guard let url = URL(string: urlString) else { return }
