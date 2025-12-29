@@ -52,7 +52,8 @@ struct Available: View {
                 ScrollView {
                     LazyVStack(spacing: 16) {
                         ForEach(0..<5, id: \.self) { _ in
-                            BookingCard(dateText: "Available")
+//                            BookingCard(dateText: "Available")
+                            //wed i put this line coment forr testing my api sorry 
                         }
                     }
                     .padding()
