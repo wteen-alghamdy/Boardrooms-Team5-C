@@ -5,40 +5,24 @@
 //  Created by Wteen Alghamdy on 05/07/1447 AH.
 //
 
-
 import SwiftUI
 
 struct MainView: View {
     @StateObject private var viewModel = MainViewModel()
+    @StateObject private var upcomingBookingVM = UpcomingBookingViewModel()
 
     init() {
-            let appearance = UINavigationBarAppearance()
-            appearance.configureWithOpaqueBackground()
-            appearance.backgroundColor = UIColor(named: "navyBlue") // تأكدي أن الاسم مطابق في الـ Assets
-            appearance.titleTextAttributes = [
-                .foregroundColor: UIColor.white,
-                .font: UIFont.systemFont(ofSize: 17, weight: .semibold)
-            ]
-            
-            UINavigationBar.appearance().standardAppearance = appearance
-            UINavigationBar.appearance().scrollEdgeAppearance = appearance
-            UINavigationBar.appearance().compactAppearance = appearance
-        }
-    var body: some View {
-        VStack(spacing: 0) {
-            
-            // MARK: - Header
-            ZStack {
-                Color("navyBlue")
-                
-                Text("Board Rooms")
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .padding(.top, 50)
-            }
-            .frame(height: 100)
-            .ignoresSafeArea(edges: .top)
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = UIColor(named: "navyBlue")
+        appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
+        
+        UINavigationBar.appearance().standardAppearance = appearance
+        UINavigationBar.appearance().scrollEdgeAppearance = appearance
+    }
 
+    var body: some View {
+        NavigationView {
             ZStack {
                 Color("systemGrayLight")
                     .ignoresSafeArea()
@@ -46,7 +30,7 @@ struct MainView: View {
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 25) {
                         
-                        // MARK: - Banner Section
+                        // MARK: - Banner
                         ZStack {
                             Image("bg_banner_available")
                                 .resizable()
@@ -65,9 +49,12 @@ struct MainView: View {
                                         .font(.system(size: 28, weight: .bold))
                                         .foregroundColor(.white)
                                 }
+                                
                                 Spacer()
+                                
                                 HStack {
                                     Spacer()
+                                    
                                     NavigationLink(destination: Available()) {
                                         HStack(spacing: 4) {
                                             Text("Book now")
@@ -80,16 +67,20 @@ struct MainView: View {
                                 }
                             }
                             .padding(35)
+                            .frame(height: 180)
                         }
                         .padding(.horizontal)
-
-                        // MARK: - My Booking Section
+                        
+                        
+                        // MARK: - My Booking
                         VStack(alignment: .leading, spacing: 15) {
                             HStack {
                                 Text("My booking")
                                     .font(.system(size: 18, weight: .bold))
                                     .foregroundColor(Color("navyBlue"))
+                                
                                 Spacer()
+                                
                                 NavigationLink(destination: MyBookingView()) {
                                     Text("See All")
                                         .font(.subheadline)
@@ -98,24 +89,28 @@ struct MainView: View {
                             }
                             .padding(.horizontal)
                             
-                            if viewModel.isLoading {
-                                ProgressView().padding()
-                            } else if let firstRoom = viewModel.boardrooms.first {
+                            if let booking = upcomingBookingVM.nextBooking {
                                 RoomCardView(
-                                    imageUrl: firstRoom.fields.image_url,
-                                    title: firstRoom.fields.name,
-                                    floor: "Floor \(firstRoom.fields.floor_no)",
-                                    capacity: "\(firstRoom.fields.seat_no)",
-                                    tag: "Today",
+                                    imageName: "CreativeSpace",
+                                    title: "Creative Space",
+                                    floor: "Floor 5",
+                                    capacity: "1",
+                                    tag: formattedDate(booking.fields.date),
                                     tagColor: Color("navyBlue"),
                                     tagTextColor: .white,
-                                    facilities: firstRoom.fields.facilities
+                                    facilities: ["wifi"]
                                 )
                                 .padding(.horizontal)
+                            } else {
+                                Text("No upcoming bookings")
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                                    .padding(.horizontal)
                             }
+
                         }
 
-                        // MARK: - Dynamic Calendar Section
+                        // MARK: - Room List & Calendar
                         VStack(alignment: .leading, spacing: 15) {
                             Text("All bookings for \(viewModel.currentMonthName)")
                                 .font(.system(size: 18, weight: .bold))
@@ -125,9 +120,10 @@ struct MainView: View {
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 12) {
                                     ForEach(0..<viewModel.calendarDays.count, id: \.self) { index in
+                                        let item = viewModel.calendarDays[index]
                                         DateItemView(
-                                            day: viewModel.calendarDays[index].dayName,
-                                            date: viewModel.calendarDays[index].dateNumber,
+                                            day: item.dayName,
+                                            date: item.dateNumber,
                                             isSelected: index == 0
                                         )
                                     }
@@ -136,18 +132,11 @@ struct MainView: View {
                             }
                             
                             VStack(spacing: 16) {
-                                ForEach(viewModel.boardrooms) { room in
-                                    RoomCardView(
-                                        imageUrl: room.fields.image_url,
-                                        title: room.fields.name,
-                                        floor: "Floor \(room.fields.floor_no)",
-                                        capacity: "\(room.fields.seat_no)",
-                                        tag: "Available",
-                                        tagColor: Color("successGreenLight"),
-                                        tagTextColor: Color("successGreen"),
-                                        facilities: room.fields.facilities
-                                    )
-                                }
+                                RoomCardView(imageName: "CreativeSpace", title: "Creative Space", floor: "Floor 5", capacity: "1", tag: "Available", tagColor: Color("successGreenLight"), tagTextColor: Color("successGreen"), facilities: ["wifi"])
+                                
+                                RoomCardView(imageName: "IdeationRoom", title: "Ideation Room", floor: "Floor 3", capacity: "16", tag: "Unavailable", tagColor: Color("errorRedLight"), tagTextColor: Color("errorRed"), facilities: ["wifi", "desktopcomputer"])
+                                
+                                RoomCardView(imageName: "InspirationRoom", title: "Inspiration Room", floor: "Floor 1", capacity: "18", tag: "Unavailable", tagColor: Color("errorRedLight"), tagTextColor: Color("errorRed"), facilities: ["wifi", "mic", "video.fill"])
                             }
                             .padding(.horizontal)
                         }
@@ -155,18 +144,25 @@ struct MainView: View {
                     .padding(.vertical)
                 }
             }
+            .navigationTitle("Board Rooms")
+            .navigationBarTitleDisplayMode(.inline)
         }
-        .navigationBarBackButtonHidden(true)
-        .navigationBarHidden(true)
         .task {
-            await viewModel.fetchData()
+            await upcomingBookingVM.loadUpcomingBooking()
         }
     }
+    func formattedDate(_ timestamp: TimeInterval) -> String {
+        let date = Date(timeIntervalSince1970: timestamp)
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd MMM"
+        return formatter.string(from: date)
+    }
+
 }
 
 // MARK: - Room Card Component
 struct RoomCardView: View {
-    let imageUrl: String
+    let imageName: String
     let title: String
     let floor: String
     let capacity: String
@@ -177,15 +173,11 @@ struct RoomCardView: View {
 
     var body: some View {
         HStack(spacing: 15) {
-            AsyncImage(url: URL(string: imageUrl)) { image in
-                image.resizable()
-                    .aspectRatio(contentMode: .fill)
-            } placeholder: {
-                Color.gray.opacity(0.1)
-            }
-            .frame(width: 90, height: 90)
-            .cornerRadius(12)
-            .clipped()
+            Image(imageName)
+                .resizable()
+                .scaledToFill()
+                .frame(width: 90, height: 90)
+                .cornerRadius(12)
             
             VStack(alignment: .leading, spacing: 6) {
                 HStack {
@@ -197,7 +189,7 @@ struct RoomCardView: View {
                         .background(tagColor).foregroundColor(tagTextColor).cornerRadius(6)
                 }
                 
-                Text(floor).font(.caption).foregroundColor(.gray)
+                Text(floor).font(.caption).foregroundColor(Color("textSecondary"))
                 
                 HStack(spacing: 8) {
                     HStack(spacing: 4) {
@@ -210,217 +202,18 @@ struct RoomCardView: View {
                     .foregroundColor(Color("brandOrange"))
 
                     ForEach(facilities, id: \.self) { icon in
-                        Image(systemName: getIcon(for: icon))
-                            .font(.system(size: 10))
-                            .foregroundColor(.gray)
+                        Image(systemName: icon).font(.system(size: 10)).foregroundColor(.gray)
                     }
                 }
             }
         }
         .padding(12)
-        .background(Color.white)
+        .background(Color("appWhite"))
         .cornerRadius(16)
         .shadow(color: Color.black.opacity(0.04), radius: 10, x: 0, y: 5)
     }
-
-    func getIcon(for facility: String) -> String {
-        switch facility.lowercased() {
-        case "wi-fi", "wifi": return "wifi"
-        case "screen", "tv": return "tv"
-        case "projector": return "videoprojector"
-        case "microphone", "mic": return "mic"
-        default: return "circle.fill"
-        }
-    }
 }
+
 #Preview {
     MainView()
 }
-
-
-
-
-
-
-
-
-
-//
-//import SwiftUI
-//
-//struct MainView: View {
-//    @StateObject private var viewModel = MainViewModel()
-//
-//    init() {
-//        let appearance = UINavigationBarAppearance()
-//        appearance.configureWithOpaqueBackground()
-//        appearance.backgroundColor = UIColor(named: "navyBlue")
-//        appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
-//        
-//        UINavigationBar.appearance().standardAppearance = appearance
-//        UINavigationBar.appearance().scrollEdgeAppearance = appearance
-//    }
-//
-//    var body: some View {
-//        NavigationView {
-//            ZStack {
-//                Color("systemGrayLight")
-//                    .ignoresSafeArea()
-//
-//                ScrollView(showsIndicators: false) {
-//                    VStack(alignment: .leading, spacing: 25) {
-//                        
-//                        // MARK: - Banner
-//                        ZStack {
-//                            Image("bg_banner_available")
-//                                .resizable()
-//                                .aspectRatio(contentMode: .fill)
-//                                .frame(height: 180)
-//                                .frame(maxWidth: .infinity)
-//                                .clipped()
-//                                .cornerRadius(16)
-//                            
-//                            VStack(alignment: .leading) {
-//                                VStack(alignment: .leading, spacing: 4) {
-//                                    Text("All board rooms")
-//                                        .font(.system(size: 14))
-//                                        .foregroundColor(.white.opacity(0.8))
-//                                    Text("Available today")
-//                                        .font(.system(size: 28, weight: .bold))
-//                                        .foregroundColor(.white)
-//                                }
-//                                
-//                                Spacer()
-//                                
-//                                HStack {
-//                                    Spacer()
-//                                    
-//                                    NavigationLink(destination: Available()) {
-//                                        HStack(spacing: 4) {
-//                                            Text("Book now")
-//                                                .font(.system(size: 12, weight: .semibold))
-//                                            Image(systemName: "arrow.right.circle.fill")
-//                                                .font(.system(size: 22))
-//                                        }
-//                                        .foregroundColor(.white)
-//                                    }
-//                                }
-//                            }
-//                            .padding(35)
-//                            .frame(height: 180)
-//                        }
-//                        .padding(.horizontal)
-//
-//                        // MARK: - My Booking
-//                        VStack(alignment: .leading, spacing: 15) {
-//                            HStack {
-//                                Text("My booking")
-//                                    .font(.system(size: 18, weight: .bold))
-//                                    .foregroundColor(Color("navyBlue"))
-//                                
-//                                Spacer()
-//                                
-//                                NavigationLink(destination: MyBookingView()) {
-//                                    Text("See All")
-//                                        .font(.subheadline)
-//                                        .foregroundColor(Color("brandOrange"))
-//                                }
-//                            }
-//                            .padding(.horizontal)
-//                            
-//                            RoomCardView(imageName: "CreativeSpace", title: "Creative Space", floor: "Floor 5", capacity: "1", tag: "28 March", tagColor: Color("navyBlue"), tagTextColor: .white, facilities: ["wifi"])
-//                                .padding(.horizontal)
-//                        }
-//
-//                        // MARK: - Room List & Calendar
-//                        VStack(alignment: .leading, spacing: 15) {
-//                            Text("All bookings for March")
-//                                .font(.system(size: 18, weight: .bold))
-//                                .foregroundColor(Color("navyBlue"))
-//                                .padding(.horizontal)
-//                            
-//                            ScrollView(.horizontal, showsIndicators: false) {
-//                                HStack(spacing: 12) {
-//                                    ForEach(0..<viewModel.dates.count, id: \.self) { index in
-//                                        DateItemView(day: viewModel.days[index], date: viewModel.dates[index], isSelected: index == 0)
-//                                    }
-//                                }
-//                                .padding(.horizontal)
-//                            }
-//                            
-//                            VStack(spacing: 16) {
-//                                RoomCardView(imageName: "CreativeSpace", title: "Creative Space", floor: "Floor 5", capacity: "1", tag: "Available", tagColor: Color("successGreenLight"), tagTextColor: Color("successGreen"), facilities: ["wifi"])
-//                                
-//                                RoomCardView(imageName: "IdeationRoom", title: "Ideation Room", floor: "Floor 3", capacity: "16", tag: "Unavailable", tagColor: Color("errorRedLight"), tagTextColor: Color("errorRed"), facilities: ["wifi", "desktopcomputer"])
-//                                
-//                                RoomCardView(imageName: "InspirationRoom", title: "Inspiration Room", floor: "Floor 1", capacity: "18", tag: "Unavailable", tagColor: Color("errorRedLight"), tagTextColor: Color("errorRed"), facilities: ["wifi", "mic", "video.fill"])
-//                            }
-//                            .padding(.horizontal)
-//                        }
-//                    }
-//                    .padding(.vertical)
-//                }
-//            }
-//            .navigationTitle("Board Rooms")
-//            .navigationBarTitleDisplayMode(.inline)
-//        }
-//    }
-//}
-//
-//// MARK: - Room Card Component
-//struct RoomCardView: View {
-//    let imageName: String
-//    let title: String
-//    let floor: String
-//    let capacity: String
-//    let tag: String
-//    let tagColor: Color
-//    let tagTextColor: Color
-//    let facilities: [String]
-//
-//    var body: some View {
-//        HStack(spacing: 15) {
-//            Image(imageName)
-//                .resizable()
-//                .scaledToFill()
-//                .frame(width: 90, height: 90)
-//                .cornerRadius(12)
-//            
-//            VStack(alignment: .leading, spacing: 6) {
-//                HStack {
-//                    Text(title).font(.system(size: 16, weight: .bold))
-//                    Spacer()
-//                    Text(tag)
-//                        .font(.system(size: 10, weight: .bold))
-//                        .padding(.horizontal, 8).padding(.vertical, 4)
-//                        .background(tagColor).foregroundColor(tagTextColor).cornerRadius(6)
-//                }
-//                
-//                Text(floor).font(.caption).foregroundColor(Color("textSecondary"))
-//                
-//                HStack(spacing: 8) {
-//                    HStack(spacing: 4) {
-//                        Image(systemName: "person.2")
-//                        Text(capacity)
-//                    }
-//                    .font(.system(size: 10, weight: .medium))
-//                    .padding(.horizontal, 6).padding(.vertical, 2)
-//                    .background(Color.gray.opacity(0.1)).cornerRadius(4)
-//                    .foregroundColor(Color("brandOrange"))
-//
-//                    ForEach(facilities, id: \.self) { icon in
-//                        Image(systemName: icon).font(.system(size: 10)).foregroundColor(.gray)
-//                    }
-//                }
-//            }
-//        }
-//        .padding(12)
-//        .background(Color("appWhite"))
-//        .cornerRadius(16)
-//        .shadow(color: Color.black.opacity(0.04), radius: 10, x: 0, y: 5)
-//    }
-//}
-//
-//#Preview {
-//    MainView()
-//}
