@@ -11,7 +11,6 @@ import SwiftUI
 struct BoardroomsBookingApp: App {
     var body: some Scene {
         WindowGroup {
-           // ContentView()
-        }
+            LoginView()        }
     }
 }
