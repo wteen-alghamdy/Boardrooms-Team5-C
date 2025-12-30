@@ -1,3 +1,5 @@
+
+
 //
 //  MainView.swift
 //  BoardroomsBooking
@@ -65,18 +67,6 @@ struct MainView: View {
                                     }
                                 }
                             }
-                            
-                            .padding(25)
-                            .frame(maxWidth: .infinity, maxHeight: 180, alignment: .topLeading)
-
-                            HStack(spacing: 4) {
-                                Text("Book now")
-                                    .font(.system(size: 12, weight: .semibold))
-                                Image(systemName: "arrow.right.circle.fill")
-                                    .font(.system(size: 24))
-                            }
-                            .foregroundColor(.white)
-                            .padding(20)
                             .padding(35)
                             .frame(height: 180)
                         }
