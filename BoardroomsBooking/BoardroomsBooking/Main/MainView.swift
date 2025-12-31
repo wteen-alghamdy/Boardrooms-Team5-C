@@ -11,6 +11,7 @@ import SwiftUI
 
 struct MainView: View {
     @StateObject private var viewModel = MainViewModel()
+    @StateObject private var upcomingBookingVM = UpcomingBookingViewModel()
 
     init() {
         let appearance = UINavigationBarAppearance()
@@ -71,7 +72,8 @@ struct MainView: View {
                             .frame(height: 180)
                         }
                         .padding(.horizontal)
-
+                        
+                        
                         // MARK: - My Booking
                         VStack(alignment: .leading, spacing: 15) {
                             HStack {
@@ -89,21 +91,43 @@ struct MainView: View {
                             }
                             .padding(.horizontal)
                             
-                            RoomCardView(imageName: "CreativeSpace", title: "Creative Space", floor: "Floor 5", capacity: "1", tag: "28 March", tagColor: Color("navyBlue"), tagTextColor: .white, facilities: ["wifi"])
+                            if let booking = upcomingBookingVM.nextBooking {
+                                RoomCardView(
+                                    imageName: "CreativeSpace",
+                                    title: "Creative Space",
+                                    floor: "Floor 5",
+                                    capacity: "1",
+                                    tag: formattedDate(booking.fields.date),
+                                    tagColor: Color("navyBlue"),
+                                    tagTextColor: .white,
+                                    facilities: ["wifi"]
+                                )
                                 .padding(.horizontal)
+                            } else {
+                                Text("No upcoming bookings")
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                                    .padding(.horizontal)
+                            }
+
                         }
 
                         // MARK: - Room List & Calendar
                         VStack(alignment: .leading, spacing: 15) {
-                            Text("All bookings for March")
+                            Text("All bookings for \(viewModel.currentMonthName)")
                                 .font(.system(size: 18, weight: .bold))
                                 .foregroundColor(Color("navyBlue"))
                                 .padding(.horizontal)
                             
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 12) {
-                                    ForEach(0..<viewModel.dates.count, id: \.self) { index in
-                                        DateItemView(day: viewModel.days[index], date: viewModel.dates[index], isSelected: index == 0)
+                                    ForEach(0..<viewModel.calendarDays.count, id: \.self) { index in
+                                        let item = viewModel.calendarDays[index]
+                                        DateItemView(
+                                            day: item.dayName,
+                                            date: item.dateNumber,
+                                            isSelected: index == 0
+                                        )
                                     }
                                 }
                                 .padding(.horizontal)
@@ -125,7 +149,17 @@ struct MainView: View {
             .navigationTitle("Board Rooms")
             .navigationBarTitleDisplayMode(.inline)
         }
+        .task {
+            await upcomingBookingVM.loadUpcomingBooking()
+        }
     }
+    func formattedDate(_ timestamp: TimeInterval) -> String {
+        let date = Date(timeIntervalSince1970: timestamp)
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd MMM"
+        return formatter.string(from: date)
+    }
+
 }
 
 // MARK: - Room Card Component
