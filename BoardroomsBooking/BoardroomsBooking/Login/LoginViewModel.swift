@@ -28,6 +28,14 @@ class LoginViewModel: ObservableObject {
         isLoading = true
         errorMessage = nil
         
+        
+        
+        //هنا  ياخذ اليورز و الباس حقه بعدين يروح للـ api  و يقارنها هناك  بعدين يرجع القيمه
+         let filterFormula =
+         "AND({EmployeeNumber}=\(jobNumber), {password}=\"\(password)\")"
+         let encodedFilter = filterFormula.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+         let urlString = "https://api.airtable.com/v0/appElKqRPusTLsnNe/employees?filterByFormula=\(encodedFilter)"
+
         guard let url = URL(string: urlString) else { return }
         var request = URLRequest(url: url)
         request.setValue(token, forHTTPHeaderField: "Authorization")
@@ -36,15 +44,38 @@ class LoginViewModel: ObservableObject {
             let (data, _) = try await URLSession.shared.data(for: request)
             let decoded = try JSONDecoder().decode(EmployeeResponse.self, from: data)
             
+            
+            
+            //wed خليت الكود  ما يسوي قيت للكل الموظقين عشان  مو امن  و منتر خوله قالت
             // البحث عن الموظف ومطابقة الرقم والكلمة
-            if let employee = decoded.records.first(where: {
-                String($0.fields.EmployeeNumber) == jobNumber && $0.fields.password == password
-            }) {
-                UserDefaults.standard.set(String(employee.fields.EmployeeNumber), forKey: "userJobNumber")
-                isLoggedIn = true
-            } else {
-                errorMessage = "بيانات الدخول غير صحيحة"
-            }
+//            if let employee = decoded.records.first(where: {
+//                String($0.fields.EmployeeNumber) == jobNumber && $0.fields.password == password
+//            })
+//
+            
+            
+            
+            // هنا يسوي فلتر  اذا كان  الموظف موجود ولا لا
+             if let employee = decoded.records.first {
+                 UserDefaults.standard.set(String(employee.fields.EmployeeNumber), forKey: "userJobNumber")
+                 isLoggedIn = true
+             } else {
+                 errorMessage = "بيانات الدخول غير صحيحة"
+             }
+
+            
+            //wed  هذا زايد و حطيته كومنت
+//            {
+//                UserDefaults.standard.set(String(employee.fields.EmployeeNumber), forKey: "userJobNumber")
+//                isLoggedIn = true
+//            } else {
+//                errorMessage = "بيانات الدخول غير صحيحة"
+//            }
+            
+            
+            
+            
+            
         } catch {
             print("❌ Error: \(error)")
             errorMessage = "حدث خطأ في الاتصال بالسيرفر"
