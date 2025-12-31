@@ -27,11 +27,11 @@ struct MyBookingView: View {
                             presentationMode.wrappedValue.dismiss()
                             
                         }) {
-                            NavigationLink(destination: MainView()) {
+                           
                                        Image(systemName: "chevron.left")
                                            .foregroundColor(.white)
                                    }
-                        }
+                        
                         
                         Spacer()
                         
