@@ -46,7 +46,7 @@ class LoginViewModel: ObservableObject {
             
             
             
-            //wed خليت الكود  ما يسوي قيت للكل الموظقين عشان  مو امن  و منتر خوله قالت
+            //wed خليت الكود  ما يسوي قيت للكل الموظقين عشان  مو آمن  و منتر خوله قالت
             // البحث عن الموظف ومطابقة الرقم والكلمة
 //            if let employee = decoded.records.first(where: {
 //                String($0.fields.EmployeeNumber) == jobNumber && $0.fields.password == password

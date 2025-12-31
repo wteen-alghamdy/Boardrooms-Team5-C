@@ -83,9 +83,6 @@ final class MyBookingViewModel: ObservableObject {
         }
     }
 
-    
-    
-    
     func deleteBooking(recordID: String) async {
         let deleteURL = "\(urlString)/\(recordID)"
         
