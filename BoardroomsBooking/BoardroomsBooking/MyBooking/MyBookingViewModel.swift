@@ -31,7 +31,7 @@ final class MyBookingViewModel: ObservableObject {
             let decoded = try JSONDecoder().decode(BookingResponse.self, from: data)
             bookings = decoded.records
         } catch {
-            print("❌ API Error:", error)
+            print(" API Error:", error)
         }
 
         isLoading = false
@@ -78,8 +78,31 @@ final class MyBookingViewModel: ObservableObject {
             await fetchBookings() // تحديث تلقائي
             return true
         } catch {
-            print("❌ Booking failed:", error)
+            print("Booking failed:", error)
             return false
+        }
+    }
+
+    
+    
+    
+    func deleteBooking(recordID: String) async {
+        let deleteURL = "\(urlString)/\(recordID)"
+        
+        guard let url = URL(string: deleteURL) else { return }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "DELETE"
+        request.setValue(token, forHTTPHeaderField: "Authorization")
+
+        do {
+            let (_, _) = try await URLSession.shared.data(for: request)
+            print("🗑️ Booking deleted")
+            
+            // نحدث القائمة بعد الحذف
+            await fetchBookings()
+        } catch {
+            print("❌ Delete failed:", error)
         }
     }
 

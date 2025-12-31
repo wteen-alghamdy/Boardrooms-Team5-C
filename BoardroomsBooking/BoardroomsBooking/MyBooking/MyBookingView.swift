@@ -50,26 +50,64 @@ struct MyBookingView: View {
                 
                 
                 // LIST
-                ScrollView {
-                    LazyVStack(spacing: 16) {
-                        
-                        if vm.isLoading {
-                            ProgressView()
-                                .padding()
+//                ScrollView {
+//                    LazyVStack(spacing: 16) {
+//                        
+//                        if vm.isLoading {
+//                            ProgressView()
+//                                .padding()
+//                        }
+//                        //                        ForEach(0..<5, id: \.self) { _ in
+//                        //                            BookingCard(dateText: "28 March")
+//                        //                        }
+//                        
+//                        
+//                        
+//                        
+////                        ForEach(vm.bookings) { booking in
+////                            BookingCard(
+////                                dateText: vm.formatDate(booking.fields.date)
+////                            )
+////                        }
+//                        ForEach(vm.bookings) { booking in
+//                            BookingCard(
+//                                dateText: vm.formatDate(booking.fields.date)
+//                            )
+//                            .swipeActions(edge: .leading) {   // سحب
+//                                Button(role: .destructive) {
+//                                    Task {
+//                                        await vm.deleteBooking(recordID: booking.id)
+//                                    }
+//                                } label: {
+//                                    Label("Delete", systemImage: "trash")
+//                                }
+//                            }
+//                        }
+//
+//                        
+//                    }
+//                    .padding()
+//                }
+                List {
+                    ForEach(vm.bookings) { booking in
+                        BookingCard(
+                            dateText: vm.formatDate(booking.fields.date)
+                        )
+                        .listRowInsets(EdgeInsets())
+                        .listRowSeparator(.hidden)
+                        .swipeActions(edge: .trailing) {
+                            Button(role: .destructive) {
+                                Task {
+                                    await vm.deleteBooking(recordID: booking.id)
+                                }
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
                         }
-                        //                        ForEach(0..<5, id: \.self) { _ in
-                        //                            BookingCard(dateText: "28 March")
-                        //                        }
-                        ForEach(vm.bookings) { booking in
-                            BookingCard(
-                                dateText: vm.formatDate(booking.fields.date)
-                            )
-                        }
-                        
-                        
                     }
-                    .padding()
                 }
+                .listStyle(.plain)
+
             }
         }
         .task {
