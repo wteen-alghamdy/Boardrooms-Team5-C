@@ -110,6 +110,9 @@ struct MyBookingView: View {
 
             }
         }
+        .navigationTitle("My Booking ")
+            .navigationBarTitleDisplayMode(.inline)
+
         .task {
             await vm.fetchBookings()
         }
