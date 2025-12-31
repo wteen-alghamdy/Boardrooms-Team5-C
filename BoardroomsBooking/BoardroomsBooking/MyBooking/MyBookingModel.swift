@@ -24,3 +24,9 @@ struct BookingFields: Decodable {
     let status: String?
 }
  
+
+//sara
+struct Employee {
+    let id: String
+    let name: String
+}

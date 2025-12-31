@@ -43,4 +43,46 @@ final class MyBookingViewModel: ObservableObject {
         formatter.dateFormat = "dd MMM"
         return formatter.string(from: date)
     }
+    
+    
+    
+    func createBooking(
+        employeeID: String,
+        boardroomID: String,
+        date: Int
+    ) async -> Bool {
+
+        guard let url = URL(string: urlString) else { return false }
+
+        let body: [String: Any] = [
+            "records": [
+                [
+                    "fields": [
+                        "employee_id": employeeID,
+                        "boardroom_id": boardroomID,
+                        "date": date
+                    ]
+                ]
+            ]
+        ]
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue(token, forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+
+        do {
+            let (_, response) = try await URLSession.shared.data(for: request)
+            print("✅ Booking created:", response)
+            await fetchBookings() // تحديث تلقائي
+            return true
+        } catch {
+            print("❌ Booking failed:", error)
+            return false
+        }
+    }
+
 }
+
+

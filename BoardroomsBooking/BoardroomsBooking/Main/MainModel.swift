@@ -17,9 +17,11 @@ struct BoardroomRecord: Decodable, Identifiable {
 }
 
 struct BoardroomFields: Decodable {
+  //  let id: String      // ← أضف هذا
     let name: String
     let floor_no: Int
     let seat_no: Int
     let facilities: [String]
     let image_url: String
 }
+

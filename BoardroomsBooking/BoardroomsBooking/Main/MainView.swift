@@ -1,5 +1,3 @@
-
-
 //
 //  MainView.swift
 //  BoardroomsBooking
@@ -109,7 +107,6 @@ struct MainView: View {
                                     .foregroundColor(.gray)
                                     .padding(.horizontal)
                             }
-
                         }
 
                         // MARK: - Room List & Calendar
@@ -119,6 +116,7 @@ struct MainView: View {
                                 .foregroundColor(Color("navyBlue"))
                                 .padding(.horizontal)
                             
+                            // الكالندر الديناميكي 👇
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 12) {
                                     ForEach(0..<viewModel.calendarDays.count, id: \.self) { index in
@@ -133,14 +131,49 @@ struct MainView: View {
                                 .padding(.horizontal)
                             }
                             
-                            VStack(spacing: 16) {
-                                RoomCardView(imageName: "CreativeSpace", title: "Creative Space", floor: "Floor 5", capacity: "1", tag: "Available", tagColor: Color("successGreenLight"), tagTextColor: Color("successGreen"), facilities: ["wifi"])
-                                
-                                RoomCardView(imageName: "IdeationRoom", title: "Ideation Room", floor: "Floor 3", capacity: "16", tag: "Unavailable", tagColor: Color("errorRedLight"), tagTextColor: Color("errorRed"), facilities: ["wifi", "desktopcomputer"])
-                                
-                                RoomCardView(imageName: "InspirationRoom", title: "Inspiration Room", floor: "Floor 1", capacity: "18", tag: "Unavailable", tagColor: Color("errorRedLight"), tagTextColor: Color("errorRed"), facilities: ["wifi", "mic", "video.fill"])
+                            // قائمة الغرف من API 👇
+                            if viewModel.isLoading {
+                                ProgressView()
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                            } else if viewModel.boardrooms.isEmpty {
+                                VStack(spacing: 10) {
+                                    Text("No rooms available")
+                                        .foregroundColor(.gray)
+                                        .font(.caption)
+                                    Button("Refresh") {
+                                        Task {
+                                            await viewModel.fetchData()
+                                        }
+                                    }
+                                    .font(.caption)
+                                    .buttonStyle(.bordered)
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                            } else {
+                                VStack(spacing: 16) {
+                                    ForEach(viewModel.boardrooms) { room in
+                                        NavigationLink(destination: RoomDetailsView(
+                                            room: room.fields,
+                                            calendarDays: viewModel.calendarDays
+                                        )) {
+                                            RoomCardView(
+                                                imageName: getRoomImage(room.fields.name),
+                                                title: room.fields.name,
+                                                floor: "Floor \(room.fields.floor_no)",
+                                                capacity: "\(room.fields.seat_no)",
+                                                tag: "Available",
+                                                tagColor: Color("successGreenLight"),
+                                                tagTextColor: Color("successGreen"),
+                                                facilities: getFacilityIcons(room.fields.facilities)
+                                            )
+                                        }
+                                        .buttonStyle(PlainButtonStyle())
+                                    }
+                                }
+                                .padding(.horizontal)
                             }
-                            .padding(.horizontal)
                         }
                     }
                     .padding(.vertical)
@@ -151,15 +184,38 @@ struct MainView: View {
         }
         .task {
             await upcomingBookingVM.loadUpcomingBooking()
+            await viewModel.fetchData() // 👈 جلب الغرف من API
         }
     }
+    
+    // MARK: - Helper Functions
     func formattedDate(_ timestamp: TimeInterval) -> String {
         let date = Date(timeIntervalSince1970: timestamp)
         let formatter = DateFormatter()
         formatter.dateFormat = "dd MMM"
         return formatter.string(from: date)
     }
-
+    
+    func getRoomImage(_ roomName: String) -> String {
+        switch roomName {
+        case "Creative Space": return "CreativeSpace"
+        case "Ideation Room": return "IdeationRoom"
+        case "Inspiration Room": return "InspirationRoom"
+        default: return "IdeationRoom"
+        }
+    }
+    
+    func getFacilityIcons(_ facilities: [String]) -> [String] {
+        facilities.map { facility in
+            switch facility.lowercased() {
+            case "wi-fi": return "wifi"
+            case "screen": return "desktopcomputer"
+            case "microphone": return "mic"
+            case "projector": return "video.fill"
+            default: return "checkmark.circle"
+            }
+        }
+    }
 }
 
 // MARK: - Room Card Component
@@ -215,6 +271,43 @@ struct RoomCardView: View {
         .shadow(color: Color.black.opacity(0.04), radius: 10, x: 0, y: 5)
     }
 }
+
+// MARK: - Date Item Component
+//struct DateItemView: View {
+//    let day: String
+//    let date: String
+//    let isSelected: Bool
+//    
+//    var body: some View {
+//        VStack(spacing: 6) {
+//            Text(day)
+//                .font(.caption)
+//                .foregroundColor(.gray)
+//            
+//            Text(date)
+//                .font(.headline)
+//                .foregroundColor(isSelected ? .white : .primary)
+//                .frame(width: 44, height: 44)
+//                .background(isSelected ? Color(hex: "D45E39") : Color(.systemGray6))
+//                .cornerRadius(22)
+//        }
+//    }
+//}
+
+// MARK: - Color Extension
+//extension Color {
+//    init(hex: String) {
+//        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
+//        var int: UInt64 = 0
+//        Scanner(string: hex).scanHexInt64(&int)
+//        
+//        let r = Double((int >> 16) & 0xFF) / 255
+//        let g = Double((int >> 8) & 0xFF) / 255
+//        let b = Double(int & 0xFF) / 255
+//        
+//        self.init(red: r, green: g, blue: b)
+//    }
+//}
 
 #Preview {
     MainView()
