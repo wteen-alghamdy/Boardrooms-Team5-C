@@ -49,7 +49,7 @@ struct RoomDetailsView: View {
             .padding(.top, -10) // 👈 هذا السطر
 
             // MARK: Scrollable Content
-            ScrollView {
+            HStack {
                 VStack(alignment: .leading, spacing: 20) {
                     
                     // MARK: Image & Info
@@ -164,6 +164,8 @@ struct RoomDetailsView: View {
                                     )
                                     .onTapGesture {
                                         selectedDate = Int(item.dateNumber)
+                                        selectedIndex = index // 👈 هذا يخلي العنصر يتحدد ويظهر محدد
+
                                     }
 
                                 }
@@ -184,7 +186,7 @@ struct RoomDetailsView: View {
                             .cornerRadius(14)
                     }
                     .padding(.horizontal)
-                    .padding(.bottom, 30)
+                    .padding(.top, -5)
                 }
             }
         }

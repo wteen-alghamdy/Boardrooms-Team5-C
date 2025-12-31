@@ -20,6 +20,7 @@ struct MainView: View {
         UINavigationBar.appearance().standardAppearance = appearance
         UINavigationBar.appearance().scrollEdgeAppearance = appearance
     }
+    @State private var selectedDateIndex: Int = 0
 
     var body: some View {
         NavigationView {
@@ -117,6 +118,8 @@ struct MainView: View {
                                 .padding(.horizontal)
                             
                             // الكالندر الديناميكي 👇
+                        
+                            // داخل الـ ScrollView للأيام:
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 12) {
                                     ForEach(0..<viewModel.calendarDays.count, id: \.self) { index in
@@ -124,12 +127,18 @@ struct MainView: View {
                                         DateItemView(
                                             day: item.dayName,
                                             date: item.dateNumber,
-                                            isSelected: index == 0
+                                            isSelected: selectedDateIndex == index
                                         )
+                                        .onTapGesture {
+                                            selectedDateIndex = index
+                                            // 👇 هنا ممكن تعمل فلترة أو تحميل بيانات الغرف لهذا التاريخ
+                                            // viewModel.loadRooms(for: viewModel.calendarDays[index].dateNumber)
+                                        }
                                     }
                                 }
                                 .padding(.horizontal)
                             }
+
                             
                             // قائمة الغرف من API 👇
                             if viewModel.isLoading {
