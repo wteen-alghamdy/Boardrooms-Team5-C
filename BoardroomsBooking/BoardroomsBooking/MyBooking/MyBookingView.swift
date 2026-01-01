@@ -89,13 +89,37 @@ struct MyBookingView: View {
 //                    .padding()
 //                }
                 List {
+//                    ForEach(vm.bookings) { booking in
+//                        BookingCard(
+//                            dateText: vm.formatDate(booking.fields.date)
+//                        )
+//                        .listRowInsets(EdgeInsets())
+//                        .listRowSeparator(.hidden)
+//                        .swipeActions(edge: .trailing) {
+//                            Button(role: .destructive) {
+//                                Task {
+//                                    await vm.deleteBooking(recordID: booking.id)
+//                                }
+//                            } label: {
+//                                Label("Delete", systemImage: "trash")
+//                            }
+//                        }
+//                    }
                     ForEach(vm.bookings) { booking in
-                        BookingCard(
-                            dateText: vm.formatDate(booking.fields.date)
-                        )
+                        NavigationLink {
+                            EditBookingView(
+                                booking: booking,
+                                bookingVM: vm
+                            )
+                        } label: {
+                            BookingCard(
+                                dateText: vm.formatDate(booking.fields.date)
+                            )
+                        }
+                        .buttonStyle(.plain)              // عشان ما يتغير شكل الكرت
                         .listRowInsets(EdgeInsets())
                         .listRowSeparator(.hidden)
-                        .swipeActions(edge: .trailing) {
+                        .swipeActions(edge: .trailing) {  // 👈 الحذف ما تغير
                             Button(role: .destructive) {
                                 Task {
                                     await vm.deleteBooking(recordID: booking.id)
@@ -105,6 +129,7 @@ struct MyBookingView: View {
                             }
                         }
                     }
+
                 }
                 .listStyle(.plain)
 

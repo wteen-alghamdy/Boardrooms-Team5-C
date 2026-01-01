@@ -147,6 +147,36 @@ final class MyBookingViewModel: ObservableObject {
             print("❌ Delete failed:", error)
         }
     }
+    
+    
+    func updateBooking(
+        recordID: String,
+        newDate: Int
+    ) async {
+
+        let updateURL = "\(urlString)/\(recordID)"
+        guard let url = URL(string: updateURL) else { return }
+
+        let body: [String: Any] = [
+            "fields": [
+                "date": newDate
+            ]
+        ]
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "PATCH"
+        request.setValue(token, forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+
+        do {
+            let (_, _) = try await URLSession.shared.data(for: request)
+            await fetchBookings()
+        } catch {
+            print("❌ Update failed:", error)
+        }
+    }
+
 
 }
 
