@@ -70,7 +70,7 @@ struct RoomDetailsView: View {
             .padding(.top, -10)
 
             // MARK: Scrollable Content
-            ScrollView {
+            VStack {
                 VStack(alignment: .leading, spacing: 20) {
                     
                     // MARK: Image & Info
