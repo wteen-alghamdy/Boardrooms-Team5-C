@@ -10,8 +10,8 @@ import SwiftUI
 struct MainView: View {
     @StateObject private var viewModel = MainViewModel()
     @StateObject private var upcomingBookingVM = UpcomingBookingViewModel()
-
     @StateObject private var bookingVM = MyBookingViewModel()
+    
     init() {
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
@@ -21,6 +21,7 @@ struct MainView: View {
         UINavigationBar.appearance().standardAppearance = appearance
         UINavigationBar.appearance().scrollEdgeAppearance = appearance
     }
+    
     @State private var selectedDateIndex: Int = 0
 
     var body: some View {
@@ -118,9 +119,7 @@ struct MainView: View {
                                 .foregroundColor(Color("navyBlue"))
                                 .padding(.horizontal)
                             
-                            // الكالندر الديناميكي 👇
-                        
-                            // داخل الـ ScrollView للأيام:
+                            // الكالندر الديناميكي
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 12) {
                                     ForEach(0..<viewModel.calendarDays.count, id: \.self) { index in
@@ -132,8 +131,6 @@ struct MainView: View {
                                         )
                                         .onTapGesture {
                                             selectedDateIndex = index
-                                            // 👇 هنا ممكن تعمل فلترة أو تحميل بيانات الغرف لهذا التاريخ
-                                            // viewModel.loadRooms(for: viewModel.calendarDays[index].dateNumber)
                                         }
                                     }
                                 }
@@ -141,7 +138,7 @@ struct MainView: View {
                             }
 
                             
-                            // قائمة الغرف من API 👇
+                            // قائمة الغرف من API
                             if viewModel.isLoading {
                                 ProgressView()
                                     .frame(maxWidth: .infinity)
@@ -176,7 +173,9 @@ struct MainView: View {
                                         NavigationLink(destination: RoomDetailsView(
                                             room: room.fields,
                                             roomID: room.id,
-                                            calendarDays: viewModel.calendarDays
+                                            calendarDays: viewModel.calendarDays,
+                                            bookingVM: bookingVM,
+                                            initialSelectedIndex: selectedDateIndex  // 👈 التعديل هنا
                                         )) {
                                             RoomCardView(
                                                 imageName: getRoomImage(room.fields.name),
@@ -184,8 +183,7 @@ struct MainView: View {
                                                 floor: "Floor \(room.fields.floor_no)",
                                                 capacity: "\(room.fields.seat_no)",
                                                 tag: available ? "Available" : "Unavailable",
-                                                tagColor: available ? Color("successGreenLight") :
-                                                        .errorRedLight,
+                                                tagColor: available ? Color("successGreenLight") : .errorRedLight,
                                                 tagTextColor: available ? Color("successGreen") : .errorRed,
                                                 facilities: getFacilityIcons(room.fields.facilities)
                                             )
@@ -202,16 +200,13 @@ struct MainView: View {
             }
             .navigationTitle("Board Rooms")
             .navigationBarTitleDisplayMode(.inline)
-            .navigationBarBackButtonHidden(true) // ← Hides back button
-
+            .navigationBarBackButtonHidden(true)
         }
-        
         .task {
             await upcomingBookingVM.loadUpcomingBooking()
             await viewModel.fetchData()
-            await bookingVM.fetchBookings()   // ⭐ هذا المهم
+            await bookingVM.fetchBookings()
         }
-
     }
     
     // MARK: - Helper Functions
@@ -297,43 +292,6 @@ struct RoomCardView: View {
         .shadow(color: Color.black.opacity(0.04), radius: 10, x: 0, y: 5)
     }
 }
-
-// MARK: - Date Item Component
-//struct DateItemView: View {
-//    let day: String
-//    let date: String
-//    let isSelected: Bool
-//    
-//    var body: some View {
-//        VStack(spacing: 6) {
-//            Text(day)
-//                .font(.caption)
-//                .foregroundColor(.gray)
-//            
-//            Text(date)
-//                .font(.headline)
-//                .foregroundColor(isSelected ? .white : .primary)
-//                .frame(width: 44, height: 44)
-//                .background(isSelected ? Color(hex: "D45E39") : Color(.systemGray6))
-//                .cornerRadius(22)
-//        }
-//    }
-//}
-
-// MARK: - Color Extension
-//extension Color {
-//    init(hex: String) {
-//        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
-//        var int: UInt64 = 0
-//        Scanner(string: hex).scanHexInt64(&int)
-//        
-//        let r = Double((int >> 16) & 0xFF) / 255
-//        let g = Double((int >> 8) & 0xFF) / 255
-//        let b = Double(int & 0xFF) / 255
-//        
-//        self.init(red: r, green: g, blue: b)
-//    }
-//}
 
 #Preview {
     MainView()

@@ -8,15 +8,36 @@
 import SwiftUI
 
 struct RoomDetailsView: View {
+    
+    @State private var showConfirmation = false
+    @State private var confirmationRoomName = ""
+    @State private var confirmationDay = ""
+    @State private var confirmationDate = ""
+    
     let room: BoardroomFields
     let roomID: String
     let calendarDays: [(dayName: String, dateNumber: String)]
-    @State private var selectedIndex: Int = 0
+    @ObservedObject var bookingVM: MyBookingViewModel
     
-    @StateObject private var bookingVM = MyBookingViewModel()
+    let initialSelectedIndex: Int  // 👈 التعديل
+    @State private var selectedIndex: Int  // 👈 التعديل
     @State private var selectedDate: Int?
-
+    
     @Environment(\.presentationMode) var presentationMode
+    
+    // 👇 التعديل: إضافة initializer
+    init(room: BoardroomFields,
+         roomID: String,
+         calendarDays: [(dayName: String, dateNumber: String)],
+         bookingVM: MyBookingViewModel,
+         initialSelectedIndex: Int = 0) {
+        self.room = room
+        self.roomID = roomID
+        self.calendarDays = calendarDays
+        self.bookingVM = bookingVM
+        self.initialSelectedIndex = initialSelectedIndex
+        _selectedIndex = State(initialValue: initialSelectedIndex)  // 👈 هنا الحل
+    }
     
     var body: some View {
         VStack(spacing: 0) {
@@ -36,7 +57,6 @@ struct RoomDetailsView: View {
                     Text("Ideation Room")
                         .font(.headline)
                         .foregroundColor(.white)
-
                     
                     Spacer()
                     
@@ -47,10 +67,10 @@ struct RoomDetailsView: View {
                 .frame(height: 60)
                 .background(Color(hex: "232455"))
             }
-            .padding(.top, -10) // 👈 هذا السطر
+            .padding(.top, -10)
 
             // MARK: Scrollable Content
-            HStack {
+            ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
                     
                     // MARK: Image & Info
@@ -149,7 +169,6 @@ struct RoomDetailsView: View {
                     .padding(.horizontal)
                     
                     // MARK: Calendar
-                    // MARK: Calendar
                     VStack(alignment: .leading, spacing: 12) {
                         Text("All bookings for January")
                             .font(.headline)
@@ -160,7 +179,7 @@ struct RoomDetailsView: View {
                                     let item = calendarDays[index]
                                     let dateTimestamp = getTimestampForDate(index: index)
                                     let isAvailable = bookingVM.isRoomAvailable(
-                                        boardroomID: roomID, // 👈 استخدم room.name مباشرة
+                                        boardroomID: roomID,
                                         for: dateTimestamp
                                     )
 
@@ -168,7 +187,7 @@ struct RoomDetailsView: View {
                                         day: item.dayName,
                                         date: item.dateNumber,
                                         isSelected: selectedIndex == index,
-                                        isBooked: !isAvailable // 👈 عكس isAvailable
+                                        isBooked: !isAvailable
                                     )
                                     .onTapGesture {
                                         if isAvailable {
@@ -186,7 +205,29 @@ struct RoomDetailsView: View {
                     }
                     
                     // MARK: Booking Button
-                    Button(action: {}) {
+                    Button {
+                        Task {
+                            let timestamp = getTimestampForDate(index: selectedIndex)
+                            let success = await bookingVM.createBooking(
+                                employeeID: "recAngCB07LnodYvM",
+                                boardroomID: roomID,
+                                date: Int(timestamp)
+                            )
+
+                            if success {
+                                await bookingVM.fetchBookings()
+
+                                let fullDate = formatFullDate(timestamp)
+                                confirmationRoomName = room.name
+                                confirmationDay = fullDate.day
+                                confirmationDate = fullDate.date
+
+                                showConfirmation = true
+                            } else {
+                                print("❌ Booking failed")
+                            }
+                        }
+                    } label: {
                         Text("Booking")
                             .font(.headline)
                             .foregroundColor(.white)
@@ -197,11 +238,29 @@ struct RoomDetailsView: View {
                     }
                     .padding(.horizontal)
                     .padding(.top, -5)
+                    .fullScreenCover(isPresented: $showConfirmation) {
+                        BookingConfirmationView(
+                            roomName: room.name,
+                            day: calendarDays[selectedIndex].dayName,
+                            date: calendarDays[selectedIndex].dateNumber
+                        )
+                    }
                 }
             }
         }
-      //  .ignoresSafeArea(edges: .top)
         .navigationBarHidden(true)
+    }
+    
+    func formatFullDate(_ timestamp: TimeInterval) -> (day: String, date: String) {
+        let date = Date(timeIntervalSince1970: timestamp)
+        
+        let dayFormatter = DateFormatter()
+        dayFormatter.dateFormat = "EEEE"
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MMMM d, yyyy"
+        
+        return (dayFormatter.string(from: date), dateFormatter.string(from: date))
     }
     
     // MARK: - Helper Functions
@@ -262,6 +321,7 @@ struct FacilityChip: View {
         .cornerRadius(12)
     }
 }
+
 struct DateItemView: View {
     let day: String
     let date: String
@@ -272,7 +332,7 @@ struct DateItemView: View {
         VStack(spacing: 6) {
             Text(day)
                 .font(.caption)
-                .foregroundColor(isBooked ? .appWhite.opacity(0.5) : .gray)
+                .foregroundColor(isBooked ? .textSecondary.opacity(0.5) : .gray)
             
             Text(date)
                 .font(.headline)
@@ -311,17 +371,19 @@ extension Color {
         facilities: ["Wi-Fi", "Screen"],
         image_url: "https://firebasestorage.googleapis.com/v0/b/nanochallenge2-9404d.appspot.com/o/Ideation%20Room.png?alt=media&token=1663b37c-edaf-43a2-a4f7-9dd2badf17ca"
     )
-    
+
     let sampleCalendar = [
         (dayName: "Thu", dateNumber: "16"),
         (dayName: "Sun", dateNumber: "19"),
         (dayName: "Mon", dateNumber: "20")
     ]
-    
+
     RoomDetailsView(
         room: sampleRoom,
-        roomID: "rec123", // 👈 أضف sample ID
-        calendarDays: sampleCalendar
+        roomID: "rec123",
+        calendarDays: sampleCalendar,
+        bookingVM: MyBookingViewModel(),
+        initialSelectedIndex: 0  // 👈 التعديل
     )
 }
 
