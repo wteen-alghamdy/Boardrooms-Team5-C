@@ -9,8 +9,15 @@ import SwiftUI
 
 @main
 struct BoardroomsBookingApp: App {
+    @AppStorage("userJobNumber") var userJobNumber: String?
+
     var body: some Scene {
         WindowGroup {
-            LoginView()        }
+            if userJobNumber != nil {
+                MainView()
+            } else {
+                LoginView()
+            }
+        }
     }
 }
