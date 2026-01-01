@@ -202,6 +202,8 @@ struct MainView: View {
             }
             .navigationTitle("Board Rooms")
             .navigationBarTitleDisplayMode(.inline)
+            .navigationBarBackButtonHidden(true) // ← Hides back button
+
         }
         
         .task {

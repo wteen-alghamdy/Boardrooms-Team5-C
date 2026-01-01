@@ -60,6 +60,9 @@ struct Available: View {
                 }
             }
         }
+        .navigationTitle("Available Today")
+        .navigationBarTitleDisplayMode(.inline)
+
     }
 }
 
