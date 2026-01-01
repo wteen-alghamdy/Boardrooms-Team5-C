@@ -1,10 +1,9 @@
-//
+////
 //  LoginView.swift
 //  BoardroomsBooking
 //
 //  Created by Wteen Alghamdy on 04/07/1447 AH.
 //
-
 
 import SwiftUI
 
@@ -15,6 +14,7 @@ struct LoginView: View {
     var body: some View {
         NavigationStack {
             ZStack {
+                // الخلفية
                 Image("bg_topo_pattern")
                     .resizable()
                     .scaledToFill()
@@ -27,11 +27,13 @@ struct LoginView: View {
                         .padding(.top, 60)
                     
                     VStack(spacing: 18) {
+                        // حقل رقم الموظف
                         CustomInputWrapper {
                             TextField("Enter your job number", text: $viewModel.jobNumber)
                                 .keyboardType(.numberPad)
                         }
                         
+                        // حقل كلمة المرور
                         CustomInputWrapper {
                             HStack {
                                 if isPasswordVisible {
@@ -47,10 +49,12 @@ struct LoginView: View {
                         }
                     }
                     
+                    // رسالة الخطأ إن وجدت
                     if let error = viewModel.errorMessage {
                         Text(error).foregroundColor(.red).font(.caption)
                     }
 
+                    // زر تسجيل الدخول
                     Button(action: {
                         Task { await viewModel.login() }
                     }) {
@@ -66,6 +70,7 @@ struct LoginView: View {
                     .padding()
                     .background(Color(hex: "232455"))
                     .cornerRadius(12)
+                    // الانتقال للصفحة الرئيسية عند نجاح الدخول
                     .navigationDestination(isPresented: $viewModel.isLoggedIn) {
                         MainView()
                     }
@@ -74,6 +79,8 @@ struct LoginView: View {
                 }
                 .padding(25)
             }
+            // السطر البرمجي لإخفاء سهم الرجوع في هذه الصفحة
+            .navigationBarBackButtonHidden(true)
         }
     }
 }
@@ -91,13 +98,11 @@ struct CustomInputWrapper<Content: View>: View {
             .shadow(color: Color.black.opacity(0.05), radius: 8, x: 0, y: 4)
     }
 }
+
 // MARK: - Preview
 #Preview {
     LoginView()
 }
-
-
-
 
 
 
