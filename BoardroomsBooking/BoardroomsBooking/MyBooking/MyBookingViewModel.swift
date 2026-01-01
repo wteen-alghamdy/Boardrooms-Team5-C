@@ -64,6 +64,8 @@ final class MyBookingViewModel: ObservableObject {
 
     
     
+    
+    
     func createBooking(
         employeeID: String,
         boardroomID: String,
@@ -92,14 +94,39 @@ final class MyBookingViewModel: ObservableObject {
 
         do {
             let (_, response) = try await URLSession.shared.data(for: request)
-            print("✅ Booking created:", response)
-            await fetchBookings() // تحديث تلقائي
+
+            guard let httpResponse = response as? HTTPURLResponse,
+                  (200...299).contains(httpResponse.statusCode) else {
+                print("❌ Invalid response")
+                return false
+            }
+
+            await fetchBookings()
             return true
+
         } catch {
-            print("Booking failed:", error)
+            print("❌ Booking failed:", error)
             return false
         }
     }
+
+   
+    
+    
+//    func formatFullDate(_ timestamp: TimeInterval) -> (day: String, date: String) {
+//        let date = Date(timeIntervalSince1970: timestamp)
+//        
+//        let dayFormatter = DateFormatter()
+//        dayFormatter.dateFormat = "EEEE" // Sunday, Monday ...
+//        
+//        let dateFormatter = DateFormatter()
+//        dateFormatter.dateFormat = "MMMM d, yyyy" // March 19, 2023
+//        
+//        return (dayFormatter.string(from: date), dateFormatter.string(from: date))
+//    }
+
+    
+    
 
     func deleteBooking(recordID: String) async {
         let deleteURL = "\(urlString)/\(recordID)"
