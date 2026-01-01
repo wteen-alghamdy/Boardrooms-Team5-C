@@ -18,8 +18,8 @@ class MainViewModel: ObservableObject {
     
     // متغيرات التاريخ الديناميكية
     @Published var currentMonthName: String = ""
+    
     @Published var calendarDays: [(dayName: String, dateNumber: String)] = []
-
     private let urlString = "https://api.airtable.com/v0/appElKqRPusTLsnNe/boardrooms"
     private let token = "Bearer pat7E88yW3dgzlY61.2b7d03863aca9f1262dcb772f7728bd157e695799b43c7392d5faf4f52fcb001"
 
@@ -27,6 +27,7 @@ class MainViewModel: ObservableObject {
         generateCurrentMonthCalendar()
     }
 
+    
     func generateCurrentMonthCalendar() {
         let calendar = Calendar.current
         let today = Date()
@@ -48,6 +49,7 @@ class MainViewModel: ObservableObject {
         }
         self.calendarDays = tempDays
     }
+
 
     func fetchData() async {
         isLoading = true

@@ -44,6 +44,24 @@ final class MyBookingViewModel: ObservableObject {
         return formatter.string(from: date)
     }
     
+    func isRoomAvailable(
+        boardroomID: String,
+        for selectedDate: TimeInterval
+    ) -> Bool {
+
+        let calendar = Calendar.current
+        let selected = Date(timeIntervalSince1970: selectedDate)
+
+        return !bookings.contains { booking in
+            guard booking.fields.boardroom_id == boardroomID else {
+                return false
+            }
+
+            let bookingDate = Date(timeIntervalSince1970: TimeInterval(booking.fields.date))
+            return calendar.isDate(bookingDate, inSameDayAs: selected)
+        }
+    }
+
     
     
     func createBooking(
@@ -82,6 +100,7 @@ final class MyBookingViewModel: ObservableObject {
             return false
         }
     }
+
 
 }
 

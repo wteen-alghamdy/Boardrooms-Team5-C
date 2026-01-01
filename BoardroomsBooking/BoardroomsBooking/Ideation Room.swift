@@ -9,6 +9,7 @@ import SwiftUI
 
 struct RoomDetailsView: View {
     let room: BoardroomFields
+    let roomID: String
     let calendarDays: [(dayName: String, dateNumber: String)]
     @State private var selectedIndex: Int = 0
     
@@ -148,32 +149,41 @@ struct RoomDetailsView: View {
                     .padding(.horizontal)
                     
                     // MARK: Calendar
+                    // MARK: Calendar
                     VStack(alignment: .leading, spacing: 12) {
-                        Text("All bookings for March")
+                        Text("All bookings for January")
                             .font(.headline)
                         
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 14) {
                                 ForEach(0..<calendarDays.count, id: \.self) { index in
                                     let item = calendarDays[index]
+                                    let dateTimestamp = getTimestampForDate(index: index)
+                                    let isAvailable = bookingVM.isRoomAvailable(
+                                        boardroomID: roomID, // 👈 استخدم room.name مباشرة
+                                        for: dateTimestamp
+                                    )
 
                                     DateItemView(
                                         day: item.dayName,
                                         date: item.dateNumber,
-                                        isSelected: selectedIndex == index
+                                        isSelected: selectedIndex == index,
+                                        isBooked: !isAvailable // 👈 عكس isAvailable
                                     )
                                     .onTapGesture {
-                                        selectedDate = Int(item.dateNumber)
-                                        selectedIndex = index // 👈 هذا يخلي العنصر يتحدد ويظهر محدد
-
+                                        if isAvailable {
+                                            selectedDate = Int(item.dateNumber)
+                                            selectedIndex = index
+                                        }
                                     }
-
                                 }
-
                             }
                         }
                     }
                     .padding(.horizontal)
+                    .task {
+                        await bookingVM.fetchBookings()
+                    }
                     
                     // MARK: Booking Button
                     Button(action: {}) {
@@ -252,25 +262,30 @@ struct FacilityChip: View {
         .cornerRadius(12)
     }
 }
-
 struct DateItemView: View {
     let day: String
     let date: String
     let isSelected: Bool
+    var isBooked: Bool = false
     
     var body: some View {
         VStack(spacing: 6) {
             Text(day)
                 .font(.caption)
-                .foregroundColor(.gray)
+                .foregroundColor(isBooked ? .appWhite.opacity(0.5) : .gray)
             
             Text(date)
                 .font(.headline)
-                .foregroundColor(isSelected ? .white : .primary)
+                .foregroundColor(isBooked ? .appWhite : (isSelected ? .white : .primary))
                 .frame(width: 44, height: 44)
-                .background(isSelected ? Color(hex: "D45E39") : Color(.systemGray6))
+                .background(
+                    isBooked
+                        ? Color.textSecondary
+                        : (isSelected ? Color(hex: "D45E39") : Color(.systemGray6))
+                )
                 .cornerRadius(22)
         }
+        .opacity(isBooked ? 0.5 : 1.0)
     }
 }
 
@@ -303,5 +318,17 @@ extension Color {
         (dayName: "Mon", dateNumber: "20")
     ]
     
-    RoomDetailsView(room: sampleRoom, calendarDays: sampleCalendar)
+    RoomDetailsView(
+        room: sampleRoom,
+        roomID: "rec123", // 👈 أضف sample ID
+        calendarDays: sampleCalendar
+    )
+}
+
+// MARK: - Helper Function
+private func getTimestampForDate(index: Int) -> TimeInterval {
+    let calendar = Calendar.current
+    let today = Date()
+    let targetDate = calendar.date(byAdding: .day, value: index, to: today) ?? today
+    return targetDate.timeIntervalSince1970
 }

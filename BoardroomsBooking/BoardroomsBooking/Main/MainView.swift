@@ -11,6 +11,7 @@ struct MainView: View {
     @StateObject private var viewModel = MainViewModel()
     @StateObject private var upcomingBookingVM = UpcomingBookingViewModel()
 
+    @StateObject private var bookingVM = MyBookingViewModel()
     init() {
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
@@ -163,8 +164,18 @@ struct MainView: View {
                             } else {
                                 VStack(spacing: 16) {
                                     ForEach(viewModel.boardrooms) { room in
+                                        let calendar = Calendar.current
+                                        let today = Date()
+                                        let selectedDate = calendar.date(byAdding: .day, value: selectedDateIndex, to: today) ?? today
+                                        let selectedTimestamp = selectedDate.timeIntervalSince1970
+                                        let available = bookingVM.isRoomAvailable(
+                                            boardroomID: room.id,
+                                            for: selectedTimestamp
+                                        )
+                                        
                                         NavigationLink(destination: RoomDetailsView(
                                             room: room.fields,
+                                            roomID: room.id,
                                             calendarDays: viewModel.calendarDays
                                         )) {
                                             RoomCardView(
@@ -172,9 +183,10 @@ struct MainView: View {
                                                 title: room.fields.name,
                                                 floor: "Floor \(room.fields.floor_no)",
                                                 capacity: "\(room.fields.seat_no)",
-                                                tag: "Available",
-                                                tagColor: Color("successGreenLight"),
-                                                tagTextColor: Color("successGreen"),
+                                                tag: available ? "Available" : "Unavailable",
+                                                tagColor: available ? Color("successGreenLight") :
+                                                        .errorRedLight,
+                                                tagTextColor: available ? Color("successGreen") : .errorRed,
                                                 facilities: getFacilityIcons(room.fields.facilities)
                                             )
                                         }
@@ -191,10 +203,13 @@ struct MainView: View {
             .navigationTitle("Board Rooms")
             .navigationBarTitleDisplayMode(.inline)
         }
+        
         .task {
             await upcomingBookingVM.loadUpcomingBooking()
-            await viewModel.fetchData() // 👈 جلب الغرف من API
+            await viewModel.fetchData()
+            await bookingVM.fetchBookings()   // ⭐ هذا المهم
         }
+
     }
     
     // MARK: - Helper Functions
