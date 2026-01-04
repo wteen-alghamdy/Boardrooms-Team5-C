@@ -6,6 +6,8 @@ import Foundation
 
 
 struct MyBookingView: View {
+    @EnvironmentObject var mainViewModel: MainViewModel  // ✅ environment object
+
     @Environment(\.presentationMode) var presentationMode
     //    @Environment(\.presentationMode) var presentationMode
     @StateObject private var vm = MyBookingViewModel()
@@ -105,30 +107,61 @@ struct MyBookingView: View {
 //                            }
 //                        }
 //                    }
+//                    ForEach(vm.bookings) { booking in
+//                        NavigationLink {
+//                            EditBookingView(
+//                                booking: booking,
+//                                bookingVM: vm
+//                            )
+//                        } label: {
+//                            BookingCard(
+//                                dateText: vm.formatDate(booking.fields.date)
+//                            )
+//                        }
+//                        .buttonStyle(.plain)              // عشان ما يتغير شكل الكرت
+//                        .listRowInsets(EdgeInsets())
+//                        .listRowSeparator(.hidden)
+//                        .swipeActions(edge: .trailing) {  // 👈 الحذف ما تغير
+//                            Button(role: .destructive) {
+//                                Task {
+//                                    await vm.deleteBooking(recordID: booking.id)
+//                                }
+//                            } label: {
+//                                Label("Delete", systemImage: "trash")
+//                            }
+//                        }
+//                    }
+                    
+                    
                     ForEach(vm.bookings) { booking in
-                        NavigationLink {
-                            EditBookingView(
-                                booking: booking,
-                                bookingVM: vm
-                            )
-                        } label: {
-                            BookingCard(
-                                dateText: vm.formatDate(booking.fields.date)
-                            )
-                        }
-                        .buttonStyle(.plain)              // عشان ما يتغير شكل الكرت
-                        .listRowInsets(EdgeInsets())
-                        .listRowSeparator(.hidden)
-                        .swipeActions(edge: .trailing) {  // 👈 الحذف ما تغير
-                            Button(role: .destructive) {
-                                Task {
-                                    await vm.deleteBooking(recordID: booking.id)
-                                }
+                        if let room = mainViewModel.boardrooms.first(where: { $0.id == booking.fields.boardroom_id }) {
+                            NavigationLink {
+                                EditBookingView(
+                                    booking: booking,
+                                    bookingVM: vm
+                                )
                             } label: {
-                                Label("Delete", systemImage: "trash")
+                                BookingCard(
+                                    booking: booking,
+                                    room: room.fields,
+                                    vm: vm
+                                )
+                            }
+                            .buttonStyle(.plain)
+                            .listRowInsets(EdgeInsets())
+                            .listRowSeparator(.hidden)
+                            .swipeActions(edge: .trailing) {
+                                Button(role: .destructive) {
+                                    Task {
+                                        await vm.deleteBooking(recordID: booking.id)
+                                    }
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
                             }
                         }
                     }
+
 
                 }
                 .listStyle(.plain)
@@ -147,42 +180,123 @@ struct MyBookingView: View {
     
     
     
+//    struct BookingCard: View {
+//        let dateText: String
+//        
+//        var body: some View {
+//            HStack(alignment: .top, spacing: 12) {
+//                
+//                Image("CreativeSpace")
+//                    .resizable()
+//                    .aspectRatio(contentMode: .fill)
+//                    .frame(width: 100, height: 100)
+//                    .cornerRadius(12)
+//                
+//                VStack(alignment: .leading, spacing: 6) {
+//                    HStack {
+//                        Text("Creative Space")
+//                            .font(.headline)
+//                            .foregroundColor(Color(red: 0.1, green: 0.1, blue: 0.3))
+//                        Spacer()
+//                        
+//                        Text(dateText)
+//                            .font(.caption2)
+//                            .padding(.horizontal, 8)
+//                            .padding(.vertical, 4)
+//                            .background(dateText == "Available" ? Color("successGreenLight") : Color("navyBlue"))
+//                            .foregroundColor(dateText == "Available" ? Color("successGreen") : Color("systemGrayLight"))
+//                            .cornerRadius(6)
+//                        //
+//                        //                        .font(.caption2)
+//                        //                        .padding(.horizontal, 8)
+//                        //                        .padding(.vertical, 4)
+//                        //                        .background(Color(red: 0.15, green: 0.15, blue: 0.35))
+//                        //                        .foregroundColor(.white)
+//                        //                        .cornerRadius(6)
+//                    }
+//                    
+//                    Text("Floor 5")
+//                        .font(.subheadline)
+//                        .foregroundColor(.gray)
+//                    
+//                    HStack(spacing: 12) {
+//                        HStack(spacing: 4) {
+//                            Image(systemName: "person.2")
+//                                .font(.system(size: 12))
+//                            Text("1")
+//                                .font(.caption)
+//                        }
+//                        .padding(.horizontal, 8)
+//                        .padding(.vertical, 4)
+//                        .background(Color.orange.opacity(0.1))
+//                        .foregroundColor(.orange)
+//                        .cornerRadius(6)
+//                        
+//                        Image(systemName: "wifi")
+//                            .font(.system(size: 12))
+//                            .padding(6)
+//                            .background(Color.blue.opacity(0.05))
+//                            .clipShape(Circle())
+//                    }
+//                }
+//            }
+//            .padding()
+//            .frame(width: 385, height: 140)
+//            .background(Color.white)
+//            .cornerRadius(16)
+//            .shadow(color: .black.opacity(0.05), radius: 5)
+//        }
+//        
+//    }
+    
     struct BookingCard: View {
-        let dateText: String
+        let booking: BookingRecord
+        let room: BoardroomFields // room info
         
+        @ObservedObject var vm: MyBookingViewModel
+
         var body: some View {
             HStack(alignment: .top, spacing: 12) {
-                
-                Image("CreativeSpace")
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: 100, height: 100)
-                    .cornerRadius(12)
+                // Room image
+                AsyncImage(url: URL(string: room.image_url)) { phase in
+                    switch phase {
+                    case .empty:
+                        Color.gray.opacity(0.3)
+                            .frame(width: 100, height: 100)
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 100, height: 100)
+                            .cornerRadius(12)
+                    case .failure:
+                        Image("CreativeSpace") // fallback
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 100, height: 100)
+                            .cornerRadius(12)
+                    @unknown default:
+                        EmptyView()
+                    }
+                }
                 
                 VStack(alignment: .leading, spacing: 6) {
                     HStack {
-                        Text("Creative Space")
+                        Text(room.name)
                             .font(.headline)
                             .foregroundColor(Color(red: 0.1, green: 0.1, blue: 0.3))
                         Spacer()
                         
-                        Text(dateText)
+                        Text(vm.formatDate(booking.fields.date))
                             .font(.caption2)
                             .padding(.horizontal, 8)
                             .padding(.vertical, 4)
-                            .background(dateText == "Available" ? Color("successGreenLight") : Color("navyBlue"))
-                            .foregroundColor(dateText == "Available" ? Color("successGreen") : Color("systemGrayLight"))
+                            .background(Color("navyBlue"))
+                            .foregroundColor(.white)
                             .cornerRadius(6)
-                        //
-                        //                        .font(.caption2)
-                        //                        .padding(.horizontal, 8)
-                        //                        .padding(.vertical, 4)
-                        //                        .background(Color(red: 0.15, green: 0.15, blue: 0.35))
-                        //                        .foregroundColor(.white)
-                        //                        .cornerRadius(6)
                     }
                     
-                    Text("Floor 5")
+                    Text("Floor \(room.floor_no)")
                         .font(.subheadline)
                         .foregroundColor(.gray)
                     
@@ -190,7 +304,7 @@ struct MyBookingView: View {
                         HStack(spacing: 4) {
                             Image(systemName: "person.2")
                                 .font(.system(size: 12))
-                            Text("1")
+                            Text("\(room.seat_no)")
                                 .font(.caption)
                         }
                         .padding(.horizontal, 8)
@@ -213,8 +327,8 @@ struct MyBookingView: View {
             .cornerRadius(16)
             .shadow(color: .black.opacity(0.05), radius: 5)
         }
-        
     }
+
     
 }
 
