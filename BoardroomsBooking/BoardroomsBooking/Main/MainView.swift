@@ -129,7 +129,7 @@ struct MainView: View {
                     .font(.system(size: 18, weight: .bold))
                     .foregroundColor(Color("navyBlue"))
                 Spacer()
-                NavigationLink(destination: MyBookingView()) {
+                NavigationLink(destination: MyBookingView().environmentObject(viewModel)) {
                     Text("See All")
                         .font(.subheadline)
                         .foregroundColor(Color("brandOrange"))

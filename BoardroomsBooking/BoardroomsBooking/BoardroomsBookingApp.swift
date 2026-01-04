@@ -10,11 +10,13 @@ import SwiftUI
 @main
 struct BoardroomsBookingApp: App {
     @AppStorage("userJobNumber") var userJobNumber: String?
+    @StateObject private var mainVM = MainViewModel()
 
     var body: some Scene {
         WindowGroup {
             if userJobNumber != nil {
                 MainView()
+                    .environmentObject(mainVM)
             } else {
                 LoginView()
             }
