@@ -23,7 +23,7 @@ class LoginViewModel: ObservableObject {
 
     func login() async {
         guard !jobNumber.isEmpty && !password.isEmpty else {
-            errorMessage = "يرجى إدخال رقم الموظف وكلمة المرور"
+            errorMessage = "please enter your jop number andd password"
             return
         }
         
@@ -45,11 +45,11 @@ class LoginViewModel: ObservableObject {
                 UserDefaults.standard.set(String(employee.fields.EmployeeNumber), forKey: "userJobNumber")
                 isLoggedIn = true
             } else {
-                errorMessage = "بيانات الدخول غير صحيحة"
+                errorMessage = "incorrect ligin details"
             }
             
         } catch {
-            errorMessage = "حدث خطأ في الاتصال بالسيرفر"
+            errorMessage = "error in connecting to the server"
         }
         isLoading = false
     }
