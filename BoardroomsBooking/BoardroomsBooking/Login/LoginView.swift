@@ -79,7 +79,6 @@ struct LoginView: View {
                 }
                 .padding(25)
             }
-            // السطر البرمجي لإخفاء سهم الرجوع في هذه الصفحة
             .navigationBarBackButtonHidden(true)
         }
     }
