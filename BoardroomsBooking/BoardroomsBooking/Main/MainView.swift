@@ -304,8 +304,10 @@ struct RoomCardView: View {
 }
 
 
-
-
+//wed 
+#Preview {
+    MainView()
+}
 
 
 

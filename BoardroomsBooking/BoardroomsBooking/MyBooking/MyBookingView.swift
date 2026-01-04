@@ -138,7 +138,8 @@ struct MyBookingView: View {
                             NavigationLink {
                                 EditBookingView(
                                     booking: booking,
-                                    bookingVM: vm
+                                    bookingVM: vm,
+                                    room: room.fields
                                 )
                             } label: {
                                 BookingCard(
