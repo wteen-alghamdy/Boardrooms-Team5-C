@@ -31,10 +31,44 @@ struct MainView: View {
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 25) {
                         
-                        bannerView
+                        // MARK: - My Booking
+                        VStack(alignment: .leading, spacing: 15) {
+                            HStack {
+                                Text("My booking")
+                                    .font(.system(size: 18, weight: .bold))
+                                    .foregroundColor(Color("navyBlue"))
+                                
+                                Spacer()
+                                
+                                NavigationLink(destination: MyBookingView().environmentObject(viewModel)) {
+                                    Text("See All")
+                                        .font(.subheadline)
+                                        .foregroundColor(Color("brandOrange"))
+                                }
+                            }
+                            .padding(.horizontal)
+                            
+                            if let booking = upcomingBookingVM.nextBooking {
+                                RoomCardView(
+                                    imageName: "CreativeSpace",
+                                    title: "Creative Space",
+                                    floor: "Floor 5",
+                                    capacity: "1",
+                                    tag: formattedDate(booking.fields.date),
+                                    tagColor: Color("navyBlue"),
+                                    tagTextColor: .white,
+                                    facilities: ["wifi"]
+                                )
+                                .padding(.horizontal)
+                            } else {
+                                Text("No upcoming bookings")
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                                    .padding(.horizontal)
+                            }
+                        }
 
-                        myBookingSection
-
+                        // MARK: - Room List & Calendar
                         VStack(alignment: .leading, spacing: 15) {
                             Text("All bookings for \(viewModel.currentMonthName)")
                                 .font(.system(size: 18, weight: .bold))
