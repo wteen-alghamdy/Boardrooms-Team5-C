@@ -1,14 +1,3 @@
-//
-//  RoomDetailsView.swift
-//  BoardroomsBooking
-//
-//  Created by Wed Ahmed Alasiri on 04/07/1447 AH.
-//
-
-
-
-
-
 import SwiftUI
 
 struct RoomDetailsView: View {
@@ -23,13 +12,12 @@ struct RoomDetailsView: View {
     let calendarDays: [(dayName: String, dateNumber: String)]
     @ObservedObject var bookingVM: MyBookingViewModel
     
-    let initialSelectedIndex: Int  // 👈 التعديل
-    @State private var selectedIndex: Int  // 👈 التعديل
+    let initialSelectedIndex: Int
+    @State private var selectedIndex: Int
     @State private var selectedDate: Int?
     
     @Environment(\.presentationMode) var presentationMode
     
-    // 👇 التعديل: إضافة initializer
     init(room: BoardroomFields,
          roomID: String,
          calendarDays: [(dayName: String, dateNumber: String)],
@@ -40,12 +28,12 @@ struct RoomDetailsView: View {
         self.calendarDays = calendarDays
         self.bookingVM = bookingVM
         self.initialSelectedIndex = initialSelectedIndex
-        _selectedIndex = State(initialValue: initialSelectedIndex)  // 👈 هنا الحل
+        _selectedIndex = State(initialValue: initialSelectedIndex)
     }
     
     var body: some View {
         VStack(spacing: 0) {
-            // MARK: Header - ثابت فوق
+            // MARK: Header
             ZStack(alignment: .top) {
                 HStack {
                     Button(action: {
@@ -211,9 +199,37 @@ struct RoomDetailsView: View {
                     // MARK: Booking Button
                     Button {
                         Task {
+                            // ✅ قبل أي شي، نطبع كل اللي في UserDefaults
+                            print("🔍 === CHECKING USERDEFAULTS ===")
+                            print("All keys: \(UserDefaults.standard.dictionaryRepresentation().keys)")
+                            
+                            if let jobNum = UserDefaults.standard.string(forKey: "userJobNumber") {
+                                print("✅ Found Job Number: \(jobNum)")
+                            } else {
+                                print("❌ No Job Number found")
+                            }
+                            
+                            if let empID = UserDefaults.standard.string(forKey: "userEmployeeID") {
+                                print("✅ Found Employee ID: \(empID)")
+                            } else {
+                                print("❌ No Employee ID found")
+                            }
+                            print("🔍 === END CHECKING ===")
+                            
+                            // استرجاع معرف الموظف
+                            guard let employeeID = UserDefaults.standard.string(forKey: "userEmployeeID"),
+                                  !employeeID.isEmpty else {
+                                print("❌ CRITICAL: No valid employee ID!")
+                                return
+                            }
+                            
+                            print("📤 === CREATING BOOKING ===")
+                            print("Employee ID: \(employeeID)")
+                            print("Room ID: \(roomID)")
+                            
                             let timestamp = getTimestampForDate(index: selectedIndex)
                             let success = await bookingVM.createBooking(
-                                employeeID: "recAngCB07LnodYvM",
+                                employeeID: employeeID,
                                 boardroomID: roomID,
                                 date: Int(timestamp)
                             )
@@ -365,30 +381,6 @@ extension Color {
         
         self.init(red: r, green: g, blue: b)
     }
-}
-
-#Preview {
-    let sampleRoom = BoardroomFields(
-        name: "Ideation Room",
-        floor_no: 3,
-        seat_no: 16,
-        facilities: ["Wi-Fi", "Screen"],
-        image_url: "https://firebasestorage.googleapis.com/v0/b/nanochallenge2-9404d.appspot.com/o/Ideation%20Room.png?alt=media&token=1663b37c-edaf-43a2-a4f7-9dd2badf17ca"
-    )
-
-    let sampleCalendar = [
-        (dayName: "Thu", dateNumber: "16"),
-        (dayName: "Sun", dateNumber: "19"),
-        (dayName: "Mon", dateNumber: "20")
-    ]
-
-    RoomDetailsView(
-        room: sampleRoom,
-        roomID: "rec123",
-        calendarDays: sampleCalendar,
-        bookingVM: MyBookingViewModel(),
-        initialSelectedIndex: 0  // 👈 التعديل
-    )
 }
 
 // MARK: - Helper Function

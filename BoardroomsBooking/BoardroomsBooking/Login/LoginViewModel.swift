@@ -1,12 +1,3 @@
-//
-//  LoginViewModel.swift
-//  BoardroomsBooking
-//
-//  Created by Wteen Alghamdy on 04/07/1447 AH.
-//
-
-
-
 import Foundation
 import Combine
 
@@ -23,7 +14,7 @@ class LoginViewModel: ObservableObject {
 
     func login() async {
         guard !jobNumber.isEmpty && !password.isEmpty else {
-            errorMessage = "please enter your jop number andd password"
+            errorMessage = "please enter your job number and password"
             return
         }
         
@@ -42,21 +33,23 @@ class LoginViewModel: ObservableObject {
             let decoded = try JSONDecoder().decode(EmployeeResponse.self, from: data)
             
             if let employee = decoded.records.first {
+                // ✅ حفظ رقم الوظيفة
                 UserDefaults.standard.set(String(employee.fields.EmployeeNumber), forKey: "userJobNumber")
+                
+                // ✅ حفظ معرف السجل (record ID) - هذا المهم للـ booking
+                UserDefaults.standard.set(employee.id, forKey: "userEmployeeID")
+                
                 isLoggedIn = true
             } else {
-                errorMessage = "incorrect ligin details"
+                errorMessage = "incorrect login details"
             }
             
         } catch {
-            errorMessage = "error in connecting to the server"
+            errorMessage = "error connecting to the server"
         }
         isLoading = false
     }
 }
-
-
-
 
 
 

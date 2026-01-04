@@ -1,10 +1,3 @@
-
-//  MyBookingViewModel.swift
-//  BoardroomsBooking
-//
-//  Created by Wed Ahmed Alasiri on 09/07/1447 AH.
-//
-
 import Foundation
 import Combine
 
@@ -30,8 +23,9 @@ final class MyBookingViewModel: ObservableObject {
             let (data, _) = try await URLSession.shared.data(for: request)
             let decoded = try JSONDecoder().decode(BookingResponse.self, from: data)
             bookings = decoded.records
+            print("✅ Fetched \(bookings.count) bookings")
         } catch {
-            print(" API Error:", error)
+            print("❌ API Error:", error)
         }
 
         isLoading = false
@@ -62,10 +56,6 @@ final class MyBookingViewModel: ObservableObject {
         }
     }
 
-    
-    
-    
-    
     func createBooking(
         employeeID: String,
         boardroomID: String,
@@ -86,6 +76,12 @@ final class MyBookingViewModel: ObservableObject {
             ]
         ]
 
+        // ✅ طباعة البيانات المرسلة
+        print("📤 Sending booking request:")
+        print("   - Employee ID: \(employeeID)")
+        print("   - Boardroom ID: \(boardroomID)")
+        print("   - Date: \(date)")
+
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue(token, forHTTPHeaderField: "Authorization")
@@ -93,40 +89,38 @@ final class MyBookingViewModel: ObservableObject {
         request.httpBody = try? JSONSerialization.data(withJSONObject: body)
 
         do {
-            let (_, response) = try await URLSession.shared.data(for: request)
+            let (data, response) = try await URLSession.shared.data(for: request)
 
-            guard let httpResponse = response as? HTTPURLResponse,
-                  (200...299).contains(httpResponse.statusCode) else {
-                print("❌ Invalid response")
+            guard let httpResponse = response as? HTTPURLResponse else {
+                print("❌ Invalid response type")
+                return false
+            }
+            
+            print("📥 Response status code: \(httpResponse.statusCode)")
+            
+            if (200...299).contains(httpResponse.statusCode) {
+                // ✅ طباعة الرد من الـ API
+                if let responseJSON = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+                    print("✅ Booking created successfully:")
+                    print(responseJSON)
+                }
+                
+                await fetchBookings()
+                return true
+            } else {
+                // طباعة الخطأ من الـ API
+                if let errorJSON = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+                    print("❌ API Error Response:")
+                    print(errorJSON)
+                }
                 return false
             }
 
-            await fetchBookings()
-            return true
-
         } catch {
-            print("❌ Booking failed:", error)
+            print("❌ Booking failed with error:", error)
             return false
         }
     }
-
-   
-    
-    
-//    func formatFullDate(_ timestamp: TimeInterval) -> (day: String, date: String) {
-//        let date = Date(timeIntervalSince1970: timestamp)
-//        
-//        let dayFormatter = DateFormatter()
-//        dayFormatter.dateFormat = "EEEE" // Sunday, Monday ...
-//        
-//        let dateFormatter = DateFormatter()
-//        dateFormatter.dateFormat = "MMMM d, yyyy" // March 19, 2023
-//        
-//        return (dayFormatter.string(from: date), dateFormatter.string(from: date))
-//    }
-
-    
-    
 
     func deleteBooking(recordID: String) async {
         let deleteURL = "\(urlString)/\(recordID)"
@@ -139,15 +133,13 @@ final class MyBookingViewModel: ObservableObject {
 
         do {
             let (_, _) = try await URLSession.shared.data(for: request)
-            print("🗑️ Booking deleted")
+            print("🗑️ Booking deleted: \(recordID)")
             
-            // نحدث القائمة بعد الحذف
             await fetchBookings()
         } catch {
             print("❌ Delete failed:", error)
         }
     }
-    
     
     func updateBooking(
         recordID: String,
@@ -171,13 +163,10 @@ final class MyBookingViewModel: ObservableObject {
 
         do {
             let (_, _) = try await URLSession.shared.data(for: request)
+            print("✅ Booking updated: \(recordID)")
             await fetchBookings()
         } catch {
             print("❌ Update failed:", error)
         }
     }
-
-
 }
-
-
