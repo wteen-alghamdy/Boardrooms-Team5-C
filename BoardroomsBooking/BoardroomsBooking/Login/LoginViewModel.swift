@@ -33,24 +33,24 @@ class LoginViewModel: ObservableObject {
             let decoded = try JSONDecoder().decode(EmployeeResponse.self, from: data)
             
             if let employee = decoded.records.first {
-                // ✅ حفظ رقم الوظيفة
                 UserDefaults.standard.set(String(employee.fields.EmployeeNumber), forKey: "userJobNumber")
-                
-                // ✅ حفظ معرف السجل (record ID) - هذا المهم للـ booking
                 UserDefaults.standard.set(employee.id, forKey: "userEmployeeID")
-                
                 isLoggedIn = true
             } else {
                 errorMessage = "incorrect login details"
             }
             
-        } catch {
-            errorMessage = "error connecting to the server"
+        } catch let error as NSError {
+            // معالجة خطأ انقطاع الإنترنت
+            if error.domain == NSURLErrorDomain && error.code == NSURLErrorNotConnectedToInternet {
+                errorMessage = "You are offline. Please check your internet connection."
+            } else {
+                errorMessage = "error connecting to the server"
+            }
         }
         isLoading = false
     }
 }
-
 
 
 
