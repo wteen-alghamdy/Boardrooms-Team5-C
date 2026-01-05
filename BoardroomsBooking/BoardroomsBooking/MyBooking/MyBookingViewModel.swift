@@ -185,5 +185,19 @@ final class MyBookingViewModel: ObservableObject {
             print("❌ Update failed:", error)
         }
     }
+    
+    // ✅ دالة جديدة: استخراج أقرب حجز قادم
+    var upcomingBooking: BookingRecord? {
+        let now = Date().timeIntervalSince1970
+        
+        // فلتر الحجوزات القادمة فقط
+        let upcoming = bookings.filter {
+            TimeInterval($0.fields.date) >= now
+        }
+        
+        // إرجاع أقرب حجز
+        return upcoming.sorted {
+            $0.fields.date < $1.fields.date
+        }.first
+    }
 }
-
