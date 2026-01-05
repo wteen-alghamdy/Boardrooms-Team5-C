@@ -83,6 +83,7 @@ struct Available: View {
                                         roomID: room.id,
                                         calendarDays: mainViewModel.calendarDays,
                                         bookingVM: bookingVM,
+                                        mainVM: mainViewModel,
                                         initialSelectedIndex: selectedDateIndex
                                     )) {
                                         AvailableRoomCard(room: room.fields)

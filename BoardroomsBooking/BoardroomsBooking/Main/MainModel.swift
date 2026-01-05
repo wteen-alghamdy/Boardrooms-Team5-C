@@ -23,5 +23,21 @@ struct BoardroomFields: Decodable {
     let seat_no: Int
     let facilities: [String]
     let image_url: String
+    let description: String   // ✅ جديد
+
 }
 
+// MARK: - Facility Models
+struct FacilityRecord: Codable {
+    let id: String
+    let fields: FacilityFields
+}
+
+struct FacilityFields: Codable {
+    let name: String
+    let icon: String
+}
+
+struct FacilityResponse: Codable {
+    let records: [FacilityRecord]
+}

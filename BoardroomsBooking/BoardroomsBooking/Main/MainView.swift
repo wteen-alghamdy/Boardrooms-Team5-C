@@ -174,8 +174,8 @@ struct MainView: View {
                 .padding(.top, 40)
             } else if viewModel.boardrooms.isEmpty {
                 VStack(spacing: 10) {
-                    Text("No rooms available").foregroundColor(.gray).font(.caption)
-                    Button("Refresh") { Task { await viewModel.fetchData() } }
+                    Text("No internet connection, so no rooms available").foregroundColor(.gray).font(.caption)
+                    Button("Retry") { Task { await viewModel.fetchData() } }
                         .font(.caption).buttonStyle(.bordered)
                 }
                 .frame(maxWidth: .infinity).padding()
@@ -189,11 +189,12 @@ struct MainView: View {
                         
                         NavigationLink(destination: RoomDetailsView(
                             room: room.fields,
-                            roomID: room.id,
-                            calendarDays: viewModel.calendarDays,
-                            bookingVM: bookingVM,
-                            initialSelectedIndex: selectedDateIndex
-                        )) {
+                                roomID: room.id,
+                                calendarDays: viewModel.calendarDays,
+                                bookingVM: bookingVM,
+                                mainVM: viewModel, // ✅ صحيح
+                                initialSelectedIndex: selectedDateIndex
+                            )) {
                             RoomCardView(
                                 imageName: getRoomImage(room.fields.name),
                                 title: room.fields.name,

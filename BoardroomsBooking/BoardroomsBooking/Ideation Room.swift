@@ -11,6 +11,7 @@ struct RoomDetailsView: View {
     let roomID: String
     let calendarDays: [(dayName: String, dateNumber: String)]
     @ObservedObject var bookingVM: MyBookingViewModel
+    @ObservedObject var mainVM: MainViewModel // ✅ أضف هذا السطر
     
     let initialSelectedIndex: Int
     @State private var selectedIndex: Int
@@ -22,16 +23,20 @@ struct RoomDetailsView: View {
          roomID: String,
          calendarDays: [(dayName: String, dateNumber: String)],
          bookingVM: MyBookingViewModel,
+         mainVM: MainViewModel, // ✅ أضف هذا
          initialSelectedIndex: Int = 0) {
         self.room = room
         self.roomID = roomID
         self.calendarDays = calendarDays
         self.bookingVM = bookingVM
+        self.mainVM = mainVM // ✅ أضف هذا
         self.initialSelectedIndex = initialSelectedIndex
         _selectedIndex = State(initialValue: initialSelectedIndex)
     }
-    
     var body: some View {
+        
+        
+        
         VStack(spacing: 0) {
             // MARK: Header
             ZStack(alignment: .top) {
@@ -80,11 +85,30 @@ struct RoomDetailsView: View {
                                     .frame(height: 260)
                                     .clipped()
                             case .failure:
-                                Image(getRoomImage(room.name))
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(height: 260)
-                                    .clipped()
+                                if let url = URL(string: room.image_url) {
+                                    AsyncImage(url: url) { phase in
+                                        switch phase {
+                                        case .empty:
+                                            Color.gray.opacity(0.3)
+                                                .frame(height: 260)
+                                        case .success(let image):
+                                            image
+                                                .resizable()
+                                                .scaledToFill()
+                                                .frame(height: 260)
+                                                .clipped()
+                                        case .failure:
+                                            Color.gray.opacity(0.3)
+                                                .frame(height: 260)
+                                        @unknown default:
+                                            EmptyView()
+                                        }
+                                    }
+                                } else {
+                                    Color.gray.opacity(0.3)
+                                        .frame(height: 260)
+                                }
+
                             @unknown default:
                                 EmptyView()
                             }
@@ -131,16 +155,20 @@ struct RoomDetailsView: View {
                     }
                     
                     // MARK: Description
+                    // MARK: Description
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Description")
                             .font(.headline)
                         
-                        Text(getDescription(for: room.name))
-                            .font(.body)
-                            .foregroundColor(.gray)
-                            .padding()
-                            .background(Color(.systemGray6))
-                            .cornerRadius(12)
+                        ScrollView(.vertical, showsIndicators: true) {  // ✅ أضف ScrollView
+                            Text(room.description)
+                                .font(.body)
+                                .foregroundColor(.gray)
+                                .padding()
+                        }
+                        .frame(maxHeight: 120)  // ✅ حدد أقصى ارتفاع
+                        .background(Color(.systemGray6))
+                        .cornerRadius(12)
                     }
                     .padding(.horizontal)
                     
@@ -152,7 +180,7 @@ struct RoomDetailsView: View {
                         HStack(spacing: 12) {
                             ForEach(room.facilities, id: \.self) { facility in
                                 FacilityChip(
-                                    icon: getFacilityIcon(for: facility),
+                                    icon: mainVM.getIcon(for: facility),
                                     title: facility
                                 )
                             }
@@ -193,6 +221,7 @@ struct RoomDetailsView: View {
                     }
                     .padding(.horizontal)
                     .task {
+                        await mainVM.fetchFacilities()
                         await bookingVM.fetchBookings()
                     }
                     
@@ -283,44 +312,8 @@ struct RoomDetailsView: View {
         return (dayFormatter.string(from: date), dateFormatter.string(from: date))
     }
     
-    // MARK: - Helper Functions
     
-    private func getFacilityIcon(for facility: String) -> String {
-        switch facility.lowercased() {
-        case "wi-fi":
-            return "wifi"
-        case "screen":
-            return "tv"
-        case "microphone":
-            return "mic"
-        case "projector":
-            return "videoprojector"
-        default:
-            return "checkmark.circle"
-        }
-    }
     
-    private func getRoomImage(_ roomName: String) -> String {
-        switch roomName {
-        case "Creative Space": return "CreativeSpace"
-        case "Ideation Room": return "IdeationRoom"
-        case "Inspiration Room": return "InspirationRoom"
-        default: return "IdeationRoom"
-        }
-    }
-    
-    private func getDescription(for roomName: String) -> String {
-        switch roomName {
-        case "Creative Space":
-            return "A room designed to spark imagination and innovation, the Creative Space is perfect for small, focused meetings or one-on-one sessions. Featuring a minimalist design with warm tones, a cozy seating arrangement, and seamless Wi-Fi connectivity, this space fosters a relaxed yet professional atmosphere."
-        case "Ideation Room":
-            return "Specifically crafted for generating and refining ideas, the Ideation Room combines functionality with modern aesthetics. It features a high-resolution screen, writable wall surfaces for brainstorming, and comfortable seating for up to 16 participants."
-        case "Inspiration Room":
-            return "This versatile meeting room is equipped with everything you need to inspire and connect. With a large projector, a high-quality microphone, and ample seating for up to 18 people, the Inspiration Room is perfect for presentations, team discussions, and workshops."
-        default:
-            return "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s."
-        }
-    }
 }
 
 // MARK: - Components
@@ -390,3 +383,6 @@ private func getTimestampForDate(index: Int) -> TimeInterval {
     let targetDate = calendar.date(byAdding: .day, value: index, to: today) ?? today
     return targetDate.timeIntervalSince1970
 }
+
+
+
