@@ -102,7 +102,7 @@ struct MainView: View {
                 Spacer()
                 HStack {
                     Spacer()
-                    NavigationLink(destination: Available()) {
+                    NavigationLink(destination: Available(selectedDateIndex: selectedDateIndex)) {
                         HStack(spacing: 4) {
                             Text("Book now")
                                 .font(.system(size: 12, weight: .semibold))

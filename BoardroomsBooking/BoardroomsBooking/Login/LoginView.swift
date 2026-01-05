@@ -4,6 +4,7 @@
 //
 //  Created by Wteen Alghamdy on 04/07/1447 AH.
 //
+
 import SwiftUI
 
 struct LoginView: View {
@@ -46,10 +47,16 @@ struct LoginView: View {
                         }
                     }
                     
+                    // عرض رسالة الخطأ (تشمل حالة عدم وجود إنترنت)
                     if let errorMessage = viewModel.errorMessage {
-                        Text(errorMessage)
-                            .foregroundColor(.red)
-                            .font(.caption)
+                        HStack(spacing: 5) {
+                            if errorMessage.contains("offline") {
+                                Image(systemName: "wifi.slash")
+                            }
+                            Text(errorMessage)
+                        }
+                        .foregroundColor(.red)
+                        .font(.caption)
                     }
 
                     Button(action: {
@@ -79,6 +86,7 @@ struct LoginView: View {
                 }
                 .padding(25)
             }
+            .ignoresSafeArea(.keyboard, edges: .bottom) // منع ارتفاع الصفحة عند ظهور الكيبورد
             .navigationDestination(isPresented: $viewModel.isLoggedIn) {
                 MainView()
             }
