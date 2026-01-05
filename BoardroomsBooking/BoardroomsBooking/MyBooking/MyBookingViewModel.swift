@@ -11,7 +11,25 @@ final class MyBookingViewModel: ObservableObject {
     private let token = "Bearer pat7E88yW3dgzlY61.2b7d03863aca9f1262dcb772f7728bd157e695799b43c7392d5faf4f52fcb001"
 
     func fetchBookings() async {
-        guard let url = URL(string: urlString) else { return }
+        // ✅ استرجاع employee_id من UserDefaults
+        guard let currentEmployeeID = UserDefaults.standard.string(forKey: "userEmployeeID"),
+              !currentEmployeeID.isEmpty else {
+            print("❌ No employee ID found - cannot fetch bookings")
+            bookings = [] // مسح أي حجوزات قديمة
+            return
+        }
+        
+        print("🔍 Fetching bookings for employee: \(currentEmployeeID)")
+        
+        // ✅ إضافة فلتر للـ API لجلب حجوزات المستخدم فقط
+        let filterFormula = "{employee_id}=\"\(currentEmployeeID)\""
+        guard let encodedFilter = filterFormula.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+              let url = URL(string: "\(urlString)?filterByFormula=\(encodedFilter)") else {
+            print("❌ Failed to create URL")
+            return
+        }
+        
+        print("🌐 API URL: \(url.absoluteString)")
 
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
@@ -23,9 +41,10 @@ final class MyBookingViewModel: ObservableObject {
             let (data, _) = try await URLSession.shared.data(for: request)
             let decoded = try JSONDecoder().decode(BookingResponse.self, from: data)
             bookings = decoded.records
-            print("✅ Fetched \(bookings.count) bookings")
+            print("✅ Fetched \(bookings.count) bookings for current user (\(currentEmployeeID))")
         } catch {
             print("❌ API Error:", error)
+            bookings = [] // في حالة الخطأ، نمسح القائمة
         }
 
         isLoading = false
@@ -76,7 +95,6 @@ final class MyBookingViewModel: ObservableObject {
             ]
         ]
 
-        // ✅ طباعة البيانات المرسلة
         print("📤 Sending booking request:")
         print("   - Employee ID: \(employeeID)")
         print("   - Boardroom ID: \(boardroomID)")
@@ -99,7 +117,6 @@ final class MyBookingViewModel: ObservableObject {
             print("📥 Response status code: \(httpResponse.statusCode)")
             
             if (200...299).contains(httpResponse.statusCode) {
-                // ✅ طباعة الرد من الـ API
                 if let responseJSON = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
                     print("✅ Booking created successfully:")
                     print(responseJSON)
@@ -108,7 +125,6 @@ final class MyBookingViewModel: ObservableObject {
                 await fetchBookings()
                 return true
             } else {
-                // طباعة الخطأ من الـ API
                 if let errorJSON = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
                     print("❌ API Error Response:")
                     print(errorJSON)
@@ -170,3 +186,4 @@ final class MyBookingViewModel: ObservableObject {
         }
     }
 }
+
