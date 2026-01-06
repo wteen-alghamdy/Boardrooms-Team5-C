@@ -1,51 +1,50 @@
 # Boardrooms-Team5-C
 An App that provides a way for simplify board rooms scheduling
 
-🏢 Boardrooms Booking App
-A modern iOS application designed for corporate employees to discover and book meeting rooms or creative spaces. The app features a seamless user experience with real-time availability tracking powered by a cloud-based backend.
+🏢 Boardrooms Booking App - iOS Challenge
+A modern SwiftUI application built as part of an 11-day development challenge. The app allows users to manage boardroom bookings through a cloud-based API, focusing on a seamless user experience and robust data synchronization.
 
-✨ Key Features
-Secure Authentication: Employees can log in using their unique job number and password.
+🗓 Challenge Overview
+Duration: 11 Days (Dec 23, 2026 – Jan 6, 2026).
 
-Dynamic Room Discovery: Browse all available boardrooms with detailed info including floor level, seating capacity, and facilities.
+Goal: To build a fully functional iOS app using SwiftUI that integrates with a provided API to handle comprehensive CRUD operations.
 
-Real-time Availability: A 14-day calendar view that checks room status against existing bookings via the API.
+Work Dynamics: Developed in a group of 3 learners, with each member focusing on specific CRUD operations to ensure a collaborative and efficient development process.
 
-Complete Booking Management (CRUD):
+✨ CRUD Operations & API Integration
+The app is fully integrated with the Airtable API to handle all data persistence.
 
-Create: Book a room for a specific date.
+Create (POST): Users can select a boardroom and a specific date to generate a new booking. This sends a request to the /bookings endpoint, saving the employee_id, boardroom_id, and date.
 
-Read: View personal upcoming bookings on the home screen and a dedicated "My Booking" page.
+Read (GET):
 
-Update: Modify the date of an existing booking.
+Boardrooms: Fetches all available rooms, including their names, floors, seating capacity, and facilities.
 
-Delete: Cancel bookings using an intuitive swipe-to-delete action.
+Bookings: Retrieves booking records. The app uses filterByFormula to ensure users only see their own bookings based on their unique employee_id.
 
-Robust Error Handling: Real-time detection of internet connection status to alert users when they are offline.
+Update (PATCH): Users can modify their existing bookings. This operation updates the specific record on the API with a new date.
 
-Keyboard Management: Optimized layout that ignores safe area keyboard edges to prevent UI jumping.
+Delete (DELETE): Users can cancel a booking using an intuitive swipe-to-delete action, which removes the record from the API database.
 
-🛠 Tech Stack
-SwiftUI: For building a responsive and declarative user interface.
+🛠 Extra Development Practices
+MVVM Architecture: Follows a clean separation of concerns, making the code maintainable and scalable.
 
-MVVM Architecture: Ensures a clean separation of concerns between the data logic and the UI.
+Error Handling (Offline Support): Implemented specialized error handling to detect if the user is offline. The app alerts the user with a specific message and icon if the internet connection is lost during login or booking.
 
-Airtable API: Used as a serverless backend to store employee records, boardroom details, and booking logs.
+Secure Storage: Uses UserDefaults to securely store the userEmployeeID and userJobNumber after a successful login, ensuring data consistency across the app.
 
-Combine & Async/Await: For modern, non-blocking network requests and data binding.
+Adaptive UI: Optimized layouts to ignore safe area keyboard edges, ensuring the UI remains stable when entering data.
 
-📂 Project Structure
-Models: Data structures mapping to Airtable's JSON responses (e.g., BoardroomRecord, BookingRecord).
+📂 Deliverables
+Fully Functional App: Built with SwiftUI, implementing all features described above.
 
-ViewModels: Handles API communication, data filtering, and business logic (e.g., MainViewModel, MyBookingViewModel).
+API Integration: Complete synchronization for all Create, Read, Update, and Delete actions.
 
-Views: Modular SwiftUI views including LoginView, MainView, Available, and MyBookingView.
+Source Code: Hosted on GitHub with a clean, logical commit history.
 
-🚀 Setup & Installation
-Clone this repository.
+🛠 Technical Requirements
+Environment: Xcode 15+.
 
-Open BoardroomsBooking.xcodeproj in Xcode 15+.
+Language: Swift (SwiftUI).
 
-Ensure your API Token and Base URL are correctly configured in the ViewModel files.
-
-Build and run on a simulator or physical device running iOS 16.0+.
+Backend: Airtable API.
