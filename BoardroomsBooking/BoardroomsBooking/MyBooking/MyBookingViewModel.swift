@@ -10,12 +10,13 @@ final class MyBookingViewModel: ObservableObject {
     private let urlString = "https://api.airtable.com/v0/appElKqRPusTLsnNe/bookings"
     private let token = "Bearer pat7E88yW3dgzlY61.2b7d03863aca9f1262dcb772f7728bd157e695799b43c7392d5faf4f52fcb001"
 
+    
     func fetchBookings() async {
-        // ✅ استرجاع employee_id من UserDefaults
+        // استرجاع employee_id من UserDefaults
         guard let currentEmployeeID = UserDefaults.standard.string(forKey: "userEmployeeID"),
               !currentEmployeeID.isEmpty else {
             print("❌ No employee ID found - cannot fetch bookings")
-            bookings = [] // مسح أي حجوزات قديمة
+            bookings = []
             return
         }
         
@@ -50,6 +51,7 @@ final class MyBookingViewModel: ObservableObject {
         isLoading = false
     }
 
+    
     func formatDate(_ timestamp: TimeInterval) -> String {
         let date = Date(timeIntervalSince1970: timestamp)
         let formatter = DateFormatter()
@@ -201,3 +203,33 @@ final class MyBookingViewModel: ObservableObject {
         }.first
     }
 }
+
+
+//
+//enum BookingError: LocalizedError, Identifiable {
+//    case missingEmployeeID
+//    case invalidURL
+//    case networkError
+//    case decodingError
+//    case serverError(statusCode: Int)
+//    case unknown
+//    
+//    var id: String { localizedDescription }
+//    
+//    var errorDescription: String? {
+//        switch self {
+//        case .missingEmployeeID:
+//            return "لم يتم العثور على بيانات المستخدم"
+//        case .invalidURL:
+//            return "الرابط غير صالح"
+//        case .networkError:
+//            return "تحقق من اتصال الإنترنت"
+//        case .decodingError:
+//            return "خطأ في قراءة البيانات"
+//        case .serverError(let statusCode):
+//            return "خطأ من الخادم (Code: \(statusCode))"
+//        case .unknown:
+//            return "حدث خطأ غير متوقع"
+//        }
+//    }
+//}
