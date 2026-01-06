@@ -23,13 +23,13 @@ struct RoomDetailsView: View {
          roomID: String,
          calendarDays: [(dayName: String, dateNumber: String)],
          bookingVM: MyBookingViewModel,
-         mainVM: MainViewModel, // ✅ أضف هذا
+         mainVM: MainViewModel,
          initialSelectedIndex: Int = 0) {
         self.room = room
         self.roomID = roomID
         self.calendarDays = calendarDays
         self.bookingVM = bookingVM
-        self.mainVM = mainVM // ✅ أضف هذا
+        self.mainVM = mainVM
         self.initialSelectedIndex = initialSelectedIndex
         _selectedIndex = State(initialValue: initialSelectedIndex)
     }
@@ -66,7 +66,7 @@ struct RoomDetailsView: View {
             }
             .padding(.top, -10)
 
-            // MARK: Scrollable Content
+            
             VStack {
                 VStack(alignment: .leading, spacing: 20) {
                     
@@ -154,7 +154,7 @@ struct RoomDetailsView: View {
                         .padding(.bottom, 12)
                     }
                     
-                    // MARK: Description
+                   
                     // MARK: Description
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Description")
