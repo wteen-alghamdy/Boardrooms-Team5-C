@@ -1,10 +1,3 @@
-////
-//  LoginView.swift
-//  BoardroomsBooking
-//
-//  Created by Wteen Alghamdy on 04/07/1447 AH.
-//
-
 import SwiftUI
 
 struct LoginView: View {
@@ -19,78 +12,89 @@ struct LoginView: View {
                     .scaledToFill()
                     .ignoresSafeArea()
                 
-                VStack(alignment: .leading, spacing: 30) {
-                    Text("Welcome back! Glad to see you, Again!")
-                        .font(.system(size: 32, weight: .bold))
-                        .foregroundColor(Color(hex: "D45E39"))
-                        .padding(.top, 60)
-                    
-                    VStack(spacing: 18) {
-                        CustomInputWrapper {
-                            TextField("Enter your job number", text: $viewModel.jobNumber)
-                                .keyboardType(.numberPad)
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 30) {
+                        Text("Welcome back! Glad to see you, Again!")
+                            .font(.system(size: 32, weight: .bold))
+                            .foregroundColor(Color(hex: "D45E39"))
+                            .padding(.top, 60)
+                        
+                        VStack(spacing: 18) {
+                            CustomInputWrapper {
+                                TextField("Enter your job number", text: $viewModel.jobNumber)
+                                    .keyboardType(.numberPad)
+                            }
+                            
+                            CustomInputWrapper {
+                                HStack {
+                                    if isPasswordVisible {
+                                        TextField("Enter your password", text: $viewModel.password)
+                                    } else {
+                                        SecureField("Enter your password", text: $viewModel.password)
+                                    }
+                                    
+                                    Button(action: { isPasswordVisible.toggle() }) {
+                                        Image(systemName: isPasswordVisible ? "eye" : "eye.slash")
+                                            .foregroundColor(.gray)
+                                    }
+                                }
+                            }
                         }
                         
-                        CustomInputWrapper {
-                            HStack {
-                                if isPasswordVisible {
-                                    TextField("Enter your password", text: $viewModel.password)
-                                } else {
-                                    SecureField("Enter your password", text: $viewModel.password)
+                        // عرض رسالة الخطأ
+                        if let errorMessage = viewModel.errorMessage {
+                            HStack(spacing: 5) {
+                                if errorMessage.contains("offline") {
+                                    Image(systemName: "wifi.slash")
                                 }
-                                
-                                Button(action: { isPasswordVisible.toggle() }) {
-                                    Image(systemName: isPasswordVisible ? "eye" : "eye.slash")
-                                        .foregroundColor(.gray)
-                                }
+                                Text(errorMessage)
                             }
+                            .foregroundColor(.red)
+                            .font(.caption)
                         }
-                    }
-                    
-                    // عرض رسالة الخطأ (تشمل حالة عدم وجود إنترنت)
-                    if let errorMessage = viewModel.errorMessage {
-                        HStack(spacing: 5) {
-                            if errorMessage.contains("offline") {
-                                Image(systemName: "wifi.slash")
-                            }
-                            Text(errorMessage)
-                        }
-                        .foregroundColor(.red)
-                        .font(.caption)
-                    }
 
-                    Button(action: {
-                        Task {
-                            await viewModel.login()
-                        }
-                    }) {
-                        HStack {
-                            if viewModel.isLoading {
-                                ProgressView()
-                                    .tint(.white)
-                            } else {
-                                Text("Login")
-                                    .font(.headline)
-                                    .foregroundColor(.white)
+                        Button(action: {
+                            Task {
+                                await viewModel.login()
                             }
+                        }) {
+                            HStack {
+                                if viewModel.isLoading {
+                                    ProgressView()
+                                        .tint(.white)
+                                } else {
+                                    Text("Login")
+                                        .font(.headline)
+                                        .foregroundColor(.white)
+                                }
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color(hex: "232455"))
+                            .cornerRadius(12)
+                            .contentShape(Rectangle())
                         }
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color(hex: "232455"))
-                        .cornerRadius(12)
-                        .contentShape(Rectangle())
+                        .disabled(viewModel.isLoading)
+                        .padding(.top, 10)
+                        
+                        Spacer(minLength: 50)
                     }
-                    .padding(.top, 10)
-                    
-                    Spacer()
+                    .padding(25)
                 }
-                .padding(25)
+                .scrollDismissesKeyboard(.interactively) // ✅ إخفاء الكيبورد عند التمرير
             }
-            .ignoresSafeArea(.keyboard, edges: .bottom) // منع ارتفاع الصفحة عند ظهور الكيبورد
+            .onTapGesture {
+                hideKeyboard() // ✅ إخفاء الكيبورد عند الضغط على الشاشة
+            }
             .navigationDestination(isPresented: $viewModel.isLoggedIn) {
                 MainView()
             }
         }
+    }
+    
+    // ✅ دالة إخفاء الكيبورد
+    private func hideKeyboard() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
 }
 
@@ -110,8 +114,3 @@ struct CustomInputWrapper<Content: View>: View {
 #Preview {
     LoginView()
 }
-
-
-
-
-
