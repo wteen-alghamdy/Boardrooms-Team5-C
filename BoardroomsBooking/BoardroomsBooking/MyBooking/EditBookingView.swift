@@ -160,24 +160,31 @@ struct EditBookingView: View {
                             HStack(spacing: 14) {
                                 ForEach(0..<14, id: \.self) { index in
                                     let timestamp = getTimestampForDate(index: index)
+                                    
+                                    let dayName = formatDay(timestamp) // Fri, Sat, Sun...
+                                    let isWeekend = (dayName == "Fri" || dayName == "Sat")
+
                                     let isAvailable = bookingVM.isRoomAvailable(
                                         boardroomID: booking.fields.boardroom_id,
                                         for: timestamp
                                     )
 
                                     DateItemView(
-                                        day: formatDay(timestamp),
+                                        day: dayName,
                                         date: formatDate(timestamp),
                                         isSelected: selectedIndex == index,
                                         isBooked: !isAvailable
                                     )
+                                    .opacity(isWeekend ? 0.3 : 1.0)   // ✅ تظليل
                                     .onTapGesture {
-                                        if isAvailable {
+                                        // ✅ منع الاختيار إذا ويكند
+                                        if !isWeekend && isAvailable {
                                             selectedIndex = index
                                             selectedTimestamp = timestamp
                                         }
                                     }
                                 }
+
                             }
                         }
                     }

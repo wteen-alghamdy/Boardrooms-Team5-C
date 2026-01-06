@@ -11,7 +11,7 @@ struct RoomDetailsView: View {
     let roomID: String
     let calendarDays: [(dayName: String, dateNumber: String)]
     @ObservedObject var bookingVM: MyBookingViewModel
-    @ObservedObject var mainVM: MainViewModel // ✅ أضف هذا السطر
+    @ObservedObject var mainVM: MainViewModel
     
     let initialSelectedIndex: Int
     @State private var selectedIndex: Int
@@ -33,10 +33,8 @@ struct RoomDetailsView: View {
         self.initialSelectedIndex = initialSelectedIndex
         _selectedIndex = State(initialValue: initialSelectedIndex)
     }
+    
     var body: some View {
-        
-        
-        
         VStack(spacing: 0) {
             // MARK: Header
             ZStack(alignment: .top) {
@@ -160,13 +158,13 @@ struct RoomDetailsView: View {
                         Text("Description")
                             .font(.headline)
                         
-                        ScrollView(.vertical, showsIndicators: true) {  // ✅ أضف ScrollView
+                        ScrollView(.vertical, showsIndicators: true) {
                             Text(room.description)
                                 .font(.body)
                                 .foregroundColor(.gray)
                                 .padding()
                         }
-                        .frame(maxHeight: 120)  // ✅ حدد أقصى ارتفاع
+                        .frame(maxHeight: 120)
                         .background(Color(.systemGray6))
                         .cornerRadius(12)
                     }
@@ -197,6 +195,10 @@ struct RoomDetailsView: View {
                             HStack(spacing: 14) {
                                 ForEach(0..<calendarDays.count, id: \.self) { index in
                                     let item = calendarDays[index]
+                                    
+                                    // ✅ تحقق من أيام الويكند
+                                    let isWeekend = (item.dayName == "Fri" || item.dayName == "Sat")
+                                    
                                     let dateTimestamp = getTimestampForDate(index: index)
                                     let isAvailable = bookingVM.isRoomAvailable(
                                         boardroomID: roomID,
@@ -209,8 +211,10 @@ struct RoomDetailsView: View {
                                         isSelected: selectedIndex == index,
                                         isBooked: !isAvailable
                                     )
+                                    .opacity(isWeekend ? 0.3 : 1.0) // ✅ تظليل الويكند
                                     .onTapGesture {
-                                        if isAvailable {
+                                        // ✅ منع النقر على الويكند
+                                        if !isWeekend && isAvailable {
                                             selectedDate = Int(item.dateNumber)
                                             selectedIndex = index
                                         }
@@ -228,7 +232,6 @@ struct RoomDetailsView: View {
                     // MARK: Booking Button
                     Button {
                         Task {
-                            // ✅ قبل أي شي، نطبع كل اللي في UserDefaults
                             print("🔍 === CHECKING USERDEFAULTS ===")
                             print("All keys: \(UserDefaults.standard.dictionaryRepresentation().keys)")
                             
@@ -245,7 +248,6 @@ struct RoomDetailsView: View {
                             }
                             print("🔍 === END CHECKING ===")
                             
-                            // استرجاع معرف الموظف
                             guard let employeeID = UserDefaults.standard.string(forKey: "userEmployeeID"),
                                   !employeeID.isEmpty else {
                                 print("❌ CRITICAL: No valid employee ID!")
@@ -311,9 +313,6 @@ struct RoomDetailsView: View {
         
         return (dayFormatter.string(from: date), dateFormatter.string(from: date))
     }
-    
-    
-    
 }
 
 // MARK: - Components
@@ -383,6 +382,3 @@ private func getTimestampForDate(index: Int) -> TimeInterval {
     let targetDate = calendar.date(byAdding: .day, value: index, to: today) ?? today
     return targetDate.timeIntervalSince1970
 }
-
-
-
